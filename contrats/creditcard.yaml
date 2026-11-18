@@ -1,0 +1,286 @@
+contrat:
+  id: guardpay.transactions_cartes
+  version: 1.0.0
+  statut: actif
+  jeu_de_donnees: D09 creditcard_ulb
+  description: Transactions par carte reelles et anonymisees, utilisees pour valider le modele de detection.
+  proprietaire: equipe-donnees-guardpay
+  consommateurs: [ml-entrainement, ml-evaluation]
+  source:
+    nom: Fraude carte ULB
+    url: https://openml.org/data/v1/download/1673544/creditcard.arff
+    origine: ULB Machine Learning Group
+    licence: a verifier a la source d'origine
+    nature: donnees reelles anonymisees, variables PCA
+  fraicheur:
+    livraison: statique, deux jours de septembre 2013
+  volumetrie:
+    lignes_attendues: 284807
+  retention: duree du projet
+  evolution:
+    compatibilite: jeu statique, tout changement de schema = nouvelle version majeure
+    notification: revue du contrat avant tout changement de schema
+
+entree:
+  fichier: data/raw/creditcard.arff
+  format: arff
+  cle: id_transaction
+  cible: classe
+  silver: data/processed/silver/transactions_cartes.parquet
+  quarantaine: data/processed/quarantaine/transactions_cartes_rejetees.parquet
+  rapport_json: data/processed/rapport_qualite_cartes.json
+  rapport_md: docs/rapport_qualite_cartes.md
+
+champs:
+  - nom: id_transaction
+    source: genere
+    type: entier
+    obligatoire: true
+    unique: true
+    description: Numero de ligne du fichier source, cle technique ajoutee a l'ingestion.
+    classification: technique
+    regles:
+      - {id: C01, type: minimum, valeur: 1, severite: erreur}
+
+  - nom: temps
+    source: Time
+    type: decimal
+    obligatoire: true
+    unite: secondes depuis la premiere transaction
+    description: Delai ecoule depuis la premiere transaction du jeu, sur deux jours.
+    classification: technique
+    regles:
+      - {id: C02, type: plage, min: 0, max: 172792, severite: erreur}
+
+  - nom: v1
+    source: V1
+    type: decimal
+    obligatoire: true
+    description: Composante principale 1 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v2
+    source: V2
+    type: decimal
+    obligatoire: true
+    description: Composante principale 2 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v3
+    source: V3
+    type: decimal
+    obligatoire: true
+    description: Composante principale 3 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v4
+    source: V4
+    type: decimal
+    obligatoire: true
+    description: Composante principale 4 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v5
+    source: V5
+    type: decimal
+    obligatoire: true
+    description: Composante principale 5 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v6
+    source: V6
+    type: decimal
+    obligatoire: true
+    description: Composante principale 6 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v7
+    source: V7
+    type: decimal
+    obligatoire: true
+    description: Composante principale 7 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v8
+    source: V8
+    type: decimal
+    obligatoire: true
+    description: Composante principale 8 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v9
+    source: V9
+    type: decimal
+    obligatoire: true
+    description: Composante principale 9 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v10
+    source: V10
+    type: decimal
+    obligatoire: true
+    description: Composante principale 10 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v11
+    source: V11
+    type: decimal
+    obligatoire: true
+    description: Composante principale 11 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v12
+    source: V12
+    type: decimal
+    obligatoire: true
+    description: Composante principale 12 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v13
+    source: V13
+    type: decimal
+    obligatoire: true
+    description: Composante principale 13 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v14
+    source: V14
+    type: decimal
+    obligatoire: true
+    description: Composante principale 14 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v15
+    source: V15
+    type: decimal
+    obligatoire: true
+    description: Composante principale 15 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v16
+    source: V16
+    type: decimal
+    obligatoire: true
+    description: Composante principale 16 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v17
+    source: V17
+    type: decimal
+    obligatoire: true
+    description: Composante principale 17 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v18
+    source: V18
+    type: decimal
+    obligatoire: true
+    description: Composante principale 18 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v19
+    source: V19
+    type: decimal
+    obligatoire: true
+    description: Composante principale 19 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v20
+    source: V20
+    type: decimal
+    obligatoire: true
+    description: Composante principale 20 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v21
+    source: V21
+    type: decimal
+    obligatoire: true
+    description: Composante principale 21 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v22
+    source: V22
+    type: decimal
+    obligatoire: true
+    description: Composante principale 22 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v23
+    source: V23
+    type: decimal
+    obligatoire: true
+    description: Composante principale 23 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v24
+    source: V24
+    type: decimal
+    obligatoire: true
+    description: Composante principale 24 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v25
+    source: V25
+    type: decimal
+    obligatoire: true
+    description: Composante principale 25 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v26
+    source: V26
+    type: decimal
+    obligatoire: true
+    description: Composante principale 26 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v27
+    source: V27
+    type: decimal
+    obligatoire: true
+    description: Composante principale 27 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: v28
+    source: V28
+    type: decimal
+    obligatoire: true
+    description: Composante principale 28 issue d'une analyse en composantes principales, anonymisee par la source.
+    classification: variable_pca
+
+  - nom: montant
+    source: Amount
+    type: decimal
+    obligatoire: true
+    unite: euro
+    description: Montant de la transaction.
+    classification: financier
+    regles:
+      - {id: C03, type: minimum, valeur: 0, severite: erreur}
+      - {id: C04, type: expression, violation: "montant == 0", severite: avertissement, message: "montant nul, conserve car 27 de ces transactions sont des fraudes"}
+
+  - nom: classe
+    source: Class
+    type: entier
+    obligatoire: true
+    description: Etiquette de fraude, verite terrain (1 fraude).
+    classification: cible
+    usage: cible d'apprentissage, jamais utilisee comme variable
+    valeurs: [0, 1]
+    regles:
+      - {id: C05, type: valeurs, severite: erreur}
+
+regles_table:
+  - id: C20
+    nom: unicite_ligne_complete
+    type: unicite
+    champs: [temps, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, montant, classe]
+    severite: erreur
+    message: "transaction strictement identique a une autre, 1081 doublons dont 19 fraudes, ecartes pour eviter toute fuite entre apprentissage et test"
+  - {id: C21, nom: unicite_id_transaction, type: unicite, champs: [id_transaction], severite: erreur}
+
+qualite_globale:
+  taux_rejet_max: 0.01
+  actions:
+    erreur: ligne ecartee vers la quarantaine avec la liste des regles violees
+    avertissement: ligne conservee, drapeau ajoute dans la colonne controles_qualite

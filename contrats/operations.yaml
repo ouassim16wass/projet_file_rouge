@@ -1,0 +1,186 @@
+contrat:
+  id: guardpay.operations
+  version: 1.0.0
+  statut: actif
+  jeu_de_donnees: D01-D02 operations
+  description: Operations bancaires rejouees en continu depuis PaySim, telles que recues par la plateforme GuardPay.
+  proprietaire: equipe-donnees-guardpay
+  consommateurs: [streaming-silver, ml-entrainement, api-scoring, dashboards]
+  source:
+    nom: PaySim
+    url: https://huggingface.co/datasets/theman10/paysim/resolve/main/paysim.csv
+    origine: Kaggle ealaxi/paysim1
+    licence: a verifier a la source d'origine
+    nature: donnees synthetiques, aucune donnee personnelle reelle
+  fraicheur:
+    livraison: continue, un pas de temps par intervalle de rejeu
+    delai_max_ingestion_secondes: 60
+  volumetrie:
+    lignes_attendues: 6362620
+    pas_de_temps: 743
+    max_operations_par_pas: 51352
+  retention: 1 an
+  evolution:
+    compatibilite: ajout de champ optionnel autorise, suppression ou changement de type = nouvelle version majeure
+    notification: revue du contrat avant tout changement de schema
+
+entree:
+  fichier: data/raw/paysim.csv
+  format: csv
+  cle: id_operation
+  cible: est_fraude
+  silver: data/processed/silver/operations.parquet
+  quarantaine: data/processed/quarantaine/operations_rejetees.parquet
+  rapport_json: data/processed/rapport_qualite.json
+  rapport_md: docs/rapport_qualite.md
+
+champs:
+  - nom: id_operation
+    source: genere
+    type: entier
+    obligatoire: true
+    unique: true
+    description: Numero de ligne du fichier source, cle d'idempotence ajoutee a l'ingestion.
+    classification: technique
+    regles:
+      - {id: R01, type: minimum, valeur: 1, severite: erreur}
+
+  - nom: pas
+    source: step
+    type: entier
+    obligatoire: true
+    description: Pas de temps horaire, 1 correspond a la premiere heure.
+    classification: technique
+    regles:
+      - {id: R02, type: plage, min: 1, max: 743, severite: erreur}
+
+  - nom: type
+    source: type
+    type: texte
+    obligatoire: true
+    description: Nature de l'operation.
+    classification: metier
+    valeurs: [PAYMENT, TRANSFER, CASH_OUT, DEBIT, CASH_IN]
+    regles:
+      - {id: R03, type: valeurs, severite: erreur}
+
+  - nom: montant
+    source: amount
+    type: decimal
+    obligatoire: true
+    unite: unite monetaire de la banque
+    description: Montant de l'operation.
+    classification: financier
+    regles:
+      - {id: R04, type: minimum, valeur: 0, severite: erreur}
+      - {id: R05, type: expression, violation: "montant == 0", severite: avertissement, message: "montant nul, conserve car ces 16 operations sont des fraudes"}
+
+  - nom: emetteur
+    source: nameOrig
+    type: texte
+    obligatoire: true
+    description: Compte emetteur, pseudonymise par hachage sale en silver.
+    classification: identifiant
+    pseudonymise: true
+    format: "^C[0-9]+$"
+    regles:
+      - {id: R06, type: format, severite: erreur}
+
+  - nom: solde_emetteur_avant
+    source: oldbalanceOrg
+    type: decimal
+    obligatoire: true
+    description: Solde de l'emetteur avant l'operation.
+    classification: financier
+    regles:
+      - {id: R07, type: minimum, valeur: 0, severite: erreur}
+
+  - nom: solde_emetteur_apres
+    source: newbalanceOrig
+    type: decimal
+    obligatoire: true
+    description: Solde de l'emetteur apres l'operation.
+    classification: financier
+    regles:
+      - {id: R08, type: minimum, valeur: 0, severite: erreur}
+
+  - nom: destinataire
+    source: nameDest
+    type: texte
+    obligatoire: true
+    description: Compte destinataire (C client, M marchand), pseudonymise par hachage sale en silver.
+    classification: identifiant
+    pseudonymise: true
+    format: "^[CM][0-9]+$"
+    regles:
+      - {id: R09, type: format, severite: erreur}
+
+  - nom: solde_destinataire_avant
+    source: oldbalanceDest
+    type: decimal
+    obligatoire: true
+    description: Solde du destinataire avant l'operation, nul pour les marchands.
+    classification: financier
+    regles:
+      - {id: R10, type: minimum, valeur: 0, severite: erreur}
+
+  - nom: solde_destinataire_apres
+    source: newbalanceDest
+    type: decimal
+    obligatoire: true
+    description: Solde du destinataire apres l'operation, nul pour les marchands.
+    classification: financier
+    regles:
+      - {id: R11, type: minimum, valeur: 0, severite: erreur}
+
+  - nom: est_fraude
+    source: isFraud
+    type: entier
+    obligatoire: true
+    description: Etiquette de fraude, verite terrain.
+    classification: cible
+    usage: cible d'apprentissage, jamais utilisee comme variable
+    valeurs: [0, 1]
+    regles:
+      - {id: R12, type: valeurs, severite: erreur}
+
+  - nom: signalement_regle_existante
+    source: isFlaggedFraud
+    type: entier
+    obligatoire: true
+    description: Signalement par la regle metier existante du simulateur, 16 lignes sur 6 362 620.
+    classification: reference
+    usage: reference de comparaison uniquement, jamais utilisee comme variable
+    valeurs: [0, 1]
+    regles:
+      - {id: R13, type: valeurs, severite: erreur}
+
+regles_table:
+  - {id: R20, nom: unicite_id_operation, type: unicite, champs: [id_operation], severite: erreur}
+  - {id: R21, nom: unicite_cle_metier, type: unicite, champs: [pas, emetteur, destinataire, montant], severite: erreur}
+  - {id: R22, nom: pas_auto_virement, type: expression, violation: "emetteur == destinataire", severite: erreur}
+  - id: R30
+    nom: solde_emetteur_non_suivi
+    type: expression
+    violation: "type != 'CASH_IN' and solde_emetteur_avant == 0 and solde_emetteur_apres == 0"
+    severite: avertissement
+    message: solde de l'emetteur a zero avant et apres, solde non suivi par la source
+  - id: R31
+    nom: debit_plafonne
+    type: expression
+    violation: "type != 'CASH_IN' and montant > solde_emetteur_avant + 0.01 and solde_emetteur_apres == 0 and solde_emetteur_avant > 0"
+    severite: avertissement
+    message: montant superieur au solde, solde ramene a zero par la source
+  - id: R32
+    nom: ecart_solde_emetteur
+    type: expression
+    violation: "abs(solde_emetteur_avant - montant - solde_emetteur_apres) > 0.01 and type != 'CASH_IN' and not (solde_emetteur_avant == 0 and solde_emetteur_apres == 0) and not (montant > solde_emetteur_avant + 0.01 and solde_emetteur_apres == 0)"
+    severite: avertissement
+    message: ecart residuel entre solde avant, montant et solde apres
+
+qualite_globale:
+  taux_rejet_max: 0.001
+  taux_avertissement_info: suivi sans seuil bloquant
+  actions:
+    erreur: ligne ecartee vers la quarantaine avec la liste des regles violees
+    avertissement: ligne conservee, drapeau ajoute dans la colonne controles_qualite

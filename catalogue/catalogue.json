@@ -1,0 +1,1059 @@
+{
+  "jeux": [
+    {
+      "id": "D01",
+      "nom": "operations_brutes",
+      "couche": "bronze",
+      "stockage": "Kafka operations.brutes + Parquet data/processed/bronze",
+      "source": "PaySim (S1)",
+      "cle": "id_operation",
+      "frequence": "continue",
+      "sensibilite": "moyenne",
+      "retention": "1 an",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "guardpay.operations",
+      "statut": "realise",
+      "description": "Evenements recus tels quels avec metadonnees Kafka."
+    },
+    {
+      "id": "D02",
+      "nom": "operations_propres",
+      "couche": "silver",
+      "stockage": "Parquet data/processed/silver/operations.parquet",
+      "source": "D01",
+      "cle": "id_operation",
+      "frequence": "continue",
+      "sensibilite": "moyenne",
+      "retention": "1 an",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "guardpay.operations",
+      "statut": "realise",
+      "description": "Operations validees par le contrat, comptes pseudonymises, drapeaux de qualite."
+    },
+    {
+      "id": "D03",
+      "nom": "variables_operation",
+      "couche": "gold",
+      "stockage": "Parquet data/processed/gold + PostgreSQL gold.variables_operation",
+      "source": "D02",
+      "cle": "id_operation",
+      "frequence": "continue",
+      "sensibilite": "moyenne",
+      "retention": "par version du modele",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "a definir",
+      "statut": "realise en lot",
+      "description": "Variables calculees pour le modele."
+    },
+    {
+      "id": "D04",
+      "nom": "scores_operations",
+      "couche": "gold",
+      "stockage": "PostgreSQL",
+      "source": "D03, modele",
+      "cle": "id_operation",
+      "frequence": "continue",
+      "sensibilite": "moyenne",
+      "retention": "2 ans",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "a definir",
+      "statut": "prevu",
+      "description": "Score de risque et explication par operation."
+    },
+    {
+      "id": "D05",
+      "nom": "alertes",
+      "couche": "gold",
+      "stockage": "MongoDB",
+      "source": "D04",
+      "cle": "id_alerte",
+      "frequence": "continue",
+      "sensibilite": "moyenne",
+      "retention": "2 ans",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "a definir",
+      "statut": "prevu",
+      "description": "Alertes presentees aux analystes."
+    },
+    {
+      "id": "D06",
+      "nom": "dossiers_investigation",
+      "couche": "gold",
+      "stockage": "MongoDB",
+      "source": "D05",
+      "cle": "id_dossier",
+      "frequence": "a la decision",
+      "sensibilite": "moyenne",
+      "retention": "5 ans",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "a definir",
+      "statut": "prevu",
+      "description": "Decisions et notes des analystes."
+    },
+    {
+      "id": "D07",
+      "nom": "operations_rejetees",
+      "couche": "quarantaine",
+      "stockage": "Kafka operations.rejetees + Parquet data/processed/quarantaine",
+      "source": "D01",
+      "cle": "id_operation",
+      "frequence": "continue",
+      "sensibilite": "faible",
+      "retention": "90 jours",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "guardpay.operations",
+      "statut": "realise",
+      "description": "Lignes ecartees avec la liste des regles violees."
+    },
+    {
+      "id": "D08",
+      "nom": "indicateurs_horaires",
+      "couche": "gold",
+      "stockage": "Parquet data/processed/gold + PostgreSQL gold.indicateurs_horaires",
+      "source": "D02",
+      "cle": "pas + type",
+      "frequence": "horaire",
+      "sensibilite": "faible",
+      "retention": "duree du service",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "a definir",
+      "statut": "realise en lot",
+      "description": "Volumes, taux d'alerte et de rejet par heure."
+    },
+    {
+      "id": "D09",
+      "nom": "creditcard_ulb",
+      "couche": "silver",
+      "stockage": "Parquet data/processed/silver/transactions_cartes.parquet",
+      "source": "ULB (S2)",
+      "cle": "id_transaction",
+      "frequence": "statique",
+      "sensibilite": "faible",
+      "retention": "duree du projet",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "guardpay.transactions_cartes",
+      "statut": "realise",
+      "description": "284 807 transactions reelles anonymisees (variables PCA), validation du modele."
+    },
+    {
+      "id": "D10",
+      "nom": "modeles",
+      "couche": "registre",
+      "stockage": "MLflow",
+      "source": "entrainement",
+      "cle": "version",
+      "frequence": "a chaque entrainement",
+      "sensibilite": "faible",
+      "retention": "toutes versions",
+      "proprietaire": "equipe-donnees-guardpay",
+      "contrat": "n/a",
+      "statut": "prevu",
+      "description": "Modeles, parametres, metriques, artefacts."
+    }
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "nom": "PaySim",
+      "url": "https://huggingface.co/datasets/theman10/paysim/resolve/main/paysim.csv",
+      "origine": "Kaggle ealaxi/paysim1",
+      "licence": "a verifier a la source d'origine",
+      "nature": "synthetique"
+    },
+    {
+      "id": "S2",
+      "nom": "Fraude carte ULB",
+      "url": "https://openml.org/data/v1/download/1673544/creditcard.arff",
+      "origine": "ULB Machine Learning Group",
+      "licence": "a verifier a la source d'origine",
+      "nature": "reelle anonymisee"
+    }
+  ],
+  "dictionnaires": {
+    "guardpay.operations": {
+      "contrat": {
+        "id": "guardpay.operations",
+        "version": "1.0.0",
+        "statut": "actif",
+        "jeu_de_donnees": "D01-D02 operations",
+        "description": "Operations bancaires rejouees en continu depuis PaySim, telles que recues par la plateforme GuardPay.",
+        "proprietaire": "equipe-donnees-guardpay",
+        "consommateurs": [
+          "streaming-silver",
+          "ml-entrainement",
+          "api-scoring",
+          "dashboards"
+        ],
+        "source": {
+          "nom": "PaySim",
+          "url": "https://huggingface.co/datasets/theman10/paysim/resolve/main/paysim.csv",
+          "origine": "Kaggle ealaxi/paysim1",
+          "licence": "a verifier a la source d'origine",
+          "nature": "donnees synthetiques, aucune donnee personnelle reelle"
+        },
+        "fraicheur": {
+          "livraison": "continue, un pas de temps par intervalle de rejeu",
+          "delai_max_ingestion_secondes": 60
+        },
+        "volumetrie": {
+          "lignes_attendues": 6362620,
+          "pas_de_temps": 743,
+          "max_operations_par_pas": 51352
+        },
+        "retention": "1 an",
+        "evolution": {
+          "compatibilite": "ajout de champ optionnel autorise, suppression ou changement de type = nouvelle version majeure",
+          "notification": "revue du contrat avant tout changement de schema"
+        }
+      },
+      "champs": [
+        {
+          "nom": "id_operation",
+          "source": "genere",
+          "type": "entier",
+          "obligatoire": true,
+          "unique": true,
+          "description": "Numero de ligne du fichier source, cle d'idempotence ajoutee a l'ingestion.",
+          "classification": "technique",
+          "regles": [
+            {
+              "id": "R01",
+              "type": "minimum",
+              "valeur": 1,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 6362620,
+            "min": 1.0,
+            "max": 6362620.0
+          }
+        },
+        {
+          "nom": "pas",
+          "source": "step",
+          "type": "entier",
+          "obligatoire": true,
+          "description": "Pas de temps horaire, 1 correspond a la premiere heure.",
+          "classification": "technique",
+          "regles": [
+            {
+              "id": "R02",
+              "type": "plage",
+              "min": 1,
+              "max": 743,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 743,
+            "min": 1.0,
+            "max": 743.0
+          }
+        },
+        {
+          "nom": "type",
+          "source": "type",
+          "type": "texte",
+          "obligatoire": true,
+          "description": "Nature de l'operation.",
+          "classification": "metier",
+          "valeurs": [
+            "PAYMENT",
+            "TRANSFER",
+            "CASH_OUT",
+            "DEBIT",
+            "CASH_IN"
+          ],
+          "regles": [
+            {
+              "id": "R03",
+              "type": "valeurs",
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 5
+          }
+        },
+        {
+          "nom": "montant",
+          "source": "amount",
+          "type": "decimal",
+          "obligatoire": true,
+          "unite": "unite monetaire de la banque",
+          "description": "Montant de l'operation.",
+          "classification": "financier",
+          "regles": [
+            {
+              "id": "R04",
+              "type": "minimum",
+              "valeur": 0,
+              "severite": "erreur"
+            },
+            {
+              "id": "R05",
+              "type": "expression",
+              "violation": "montant == 0",
+              "severite": "avertissement",
+              "message": "montant nul, conserve car ces 16 operations sont des fraudes"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 5316900,
+            "min": 0.0,
+            "max": 92445516.64
+          }
+        },
+        {
+          "nom": "emetteur",
+          "source": "nameOrig",
+          "type": "texte",
+          "obligatoire": true,
+          "description": "Compte emetteur, pseudonymise par hachage sale en silver.",
+          "classification": "identifiant",
+          "pseudonymise": true,
+          "format": "^C[0-9]+$",
+          "regles": [
+            {
+              "id": "R06",
+              "type": "format",
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 6353307
+          }
+        },
+        {
+          "nom": "solde_emetteur_avant",
+          "source": "oldbalanceOrg",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Solde de l'emetteur avant l'operation.",
+          "classification": "financier",
+          "regles": [
+            {
+              "id": "R07",
+              "type": "minimum",
+              "valeur": 0,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 1845844,
+            "min": 0.0,
+            "max": 59585040.37
+          }
+        },
+        {
+          "nom": "solde_emetteur_apres",
+          "source": "newbalanceOrig",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Solde de l'emetteur apres l'operation.",
+          "classification": "financier",
+          "regles": [
+            {
+              "id": "R08",
+              "type": "minimum",
+              "valeur": 0,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2682586,
+            "min": 0.0,
+            "max": 49585040.37
+          }
+        },
+        {
+          "nom": "destinataire",
+          "source": "nameDest",
+          "type": "texte",
+          "obligatoire": true,
+          "description": "Compte destinataire (C client, M marchand), pseudonymise par hachage sale en silver.",
+          "classification": "identifiant",
+          "pseudonymise": true,
+          "format": "^[CM][0-9]+$",
+          "regles": [
+            {
+              "id": "R09",
+              "type": "format",
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2722362
+          }
+        },
+        {
+          "nom": "solde_destinataire_avant",
+          "source": "oldbalanceDest",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Solde du destinataire avant l'operation, nul pour les marchands.",
+          "classification": "financier",
+          "regles": [
+            {
+              "id": "R10",
+              "type": "minimum",
+              "valeur": 0,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 3614697,
+            "min": 0.0,
+            "max": 356015889.35
+          }
+        },
+        {
+          "nom": "solde_destinataire_apres",
+          "source": "newbalanceDest",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Solde du destinataire apres l'operation, nul pour les marchands.",
+          "classification": "financier",
+          "regles": [
+            {
+              "id": "R11",
+              "type": "minimum",
+              "valeur": 0,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 3555499,
+            "min": 0.0,
+            "max": 356179278.92
+          }
+        },
+        {
+          "nom": "est_fraude",
+          "source": "isFraud",
+          "type": "entier",
+          "obligatoire": true,
+          "description": "Etiquette de fraude, verite terrain.",
+          "classification": "cible",
+          "usage": "cible d'apprentissage, jamais utilisee comme variable",
+          "valeurs": [
+            0,
+            1
+          ],
+          "regles": [
+            {
+              "id": "R12",
+              "type": "valeurs",
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2,
+            "min": 0.0,
+            "max": 1.0
+          }
+        },
+        {
+          "nom": "signalement_regle_existante",
+          "source": "isFlaggedFraud",
+          "type": "entier",
+          "obligatoire": true,
+          "description": "Signalement par la regle metier existante du simulateur, 16 lignes sur 6 362 620.",
+          "classification": "reference",
+          "usage": "reference de comparaison uniquement, jamais utilisee comme variable",
+          "valeurs": [
+            0,
+            1
+          ],
+          "regles": [
+            {
+              "id": "R13",
+              "type": "valeurs",
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2,
+            "min": 0.0,
+            "max": 1.0
+          }
+        },
+        {
+          "nom": "type_destinataire",
+          "type": "texte",
+          "classification": "derive",
+          "description": "client ou marchand, deduit du prefixe du compte destinataire.",
+          "regles": [],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2
+          }
+        },
+        {
+          "nom": "controles_qualite",
+          "type": "texte",
+          "classification": "technique",
+          "description": "Identifiants des regles d'avertissement declenchees, separes par des virgules.",
+          "regles": [],
+          "stats": {
+            "nuls": 0,
+            "distincts": 5
+          }
+        }
+      ]
+    },
+    "guardpay.transactions_cartes": {
+      "contrat": {
+        "id": "guardpay.transactions_cartes",
+        "version": "1.0.0",
+        "statut": "actif",
+        "jeu_de_donnees": "D09 creditcard_ulb",
+        "description": "Transactions par carte reelles et anonymisees, utilisees pour valider le modele de detection.",
+        "proprietaire": "equipe-donnees-guardpay",
+        "consommateurs": [
+          "ml-entrainement",
+          "ml-evaluation"
+        ],
+        "source": {
+          "nom": "Fraude carte ULB",
+          "url": "https://openml.org/data/v1/download/1673544/creditcard.arff",
+          "origine": "ULB Machine Learning Group",
+          "licence": "a verifier a la source d'origine",
+          "nature": "donnees reelles anonymisees, variables PCA"
+        },
+        "fraicheur": {
+          "livraison": "statique, deux jours de septembre 2013"
+        },
+        "volumetrie": {
+          "lignes_attendues": 284807
+        },
+        "retention": "duree du projet",
+        "evolution": {
+          "compatibilite": "jeu statique, tout changement de schema = nouvelle version majeure",
+          "notification": "revue du contrat avant tout changement de schema"
+        }
+      },
+      "champs": [
+        {
+          "nom": "id_transaction",
+          "source": "genere",
+          "type": "entier",
+          "obligatoire": true,
+          "unique": true,
+          "description": "Numero de ligne du fichier source, cle technique ajoutee a l'ingestion.",
+          "classification": "technique",
+          "regles": [
+            {
+              "id": "C01",
+              "type": "minimum",
+              "valeur": 1,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 283726,
+            "min": 1.0,
+            "max": 284807.0
+          }
+        },
+        {
+          "nom": "temps",
+          "source": "Time",
+          "type": "decimal",
+          "obligatoire": true,
+          "unite": "secondes depuis la premiere transaction",
+          "description": "Delai ecoule depuis la premiere transaction du jeu, sur deux jours.",
+          "classification": "technique",
+          "regles": [
+            {
+              "id": "C02",
+              "type": "plage",
+              "min": 0,
+              "max": 172792,
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 124592,
+            "min": 0.0,
+            "max": 172792.0
+          }
+        },
+        {
+          "nom": "v1",
+          "source": "V1",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 1 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -56.407509631329,
+            "max": 2.45492999121121
+          }
+        },
+        {
+          "nom": "v2",
+          "source": "V2",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 2 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -72.7157275629303,
+            "max": 22.0577289904909
+          }
+        },
+        {
+          "nom": "v3",
+          "source": "V3",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 3 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -48.3255893623954,
+            "max": 9.38255843282114
+          }
+        },
+        {
+          "nom": "v4",
+          "source": "V4",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 4 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -5.68317119816995,
+            "max": 16.8753440335975
+          }
+        },
+        {
+          "nom": "v5",
+          "source": "V5",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 5 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -113.743306711146,
+            "max": 34.8016658766686
+          }
+        },
+        {
+          "nom": "v6",
+          "source": "V6",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 6 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -26.1605059358433,
+            "max": 73.3016255459646
+          }
+        },
+        {
+          "nom": "v7",
+          "source": "V7",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 7 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -43.5572415712451,
+            "max": 120.589493945238
+          }
+        },
+        {
+          "nom": "v8",
+          "source": "V8",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 8 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -73.2167184552674,
+            "max": 20.0072083651213
+          }
+        },
+        {
+          "nom": "v9",
+          "source": "V9",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 9 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -13.4340663182301,
+            "max": 15.5949946071278
+          }
+        },
+        {
+          "nom": "v10",
+          "source": "V10",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 10 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -24.5882624372475,
+            "max": 23.7451361206545
+          }
+        },
+        {
+          "nom": "v11",
+          "source": "V11",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 11 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -4.79747346479757,
+            "max": 12.0189131816199
+          }
+        },
+        {
+          "nom": "v12",
+          "source": "V12",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 12 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -18.6837146333443,
+            "max": 7.8483920756446
+          }
+        },
+        {
+          "nom": "v13",
+          "source": "V13",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 13 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -5.79188120632084,
+            "max": 7.12688295859376
+          }
+        },
+        {
+          "nom": "v14",
+          "source": "V14",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 14 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -19.2143254902614,
+            "max": 10.5267660517847
+          }
+        },
+        {
+          "nom": "v15",
+          "source": "V15",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 15 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -4.49894467676621,
+            "max": 8.87774159774277
+          }
+        },
+        {
+          "nom": "v16",
+          "source": "V16",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 16 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -14.1298545174931,
+            "max": 17.3151115176278
+          }
+        },
+        {
+          "nom": "v17",
+          "source": "V17",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 17 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -25.1627993693248,
+            "max": 9.25352625047285
+          }
+        },
+        {
+          "nom": "v18",
+          "source": "V18",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 18 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -9.49874592104677,
+            "max": 5.04106918541184
+          }
+        },
+        {
+          "nom": "v19",
+          "source": "V19",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 19 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -7.21352743017759,
+            "max": 5.59197142733558
+          }
+        },
+        {
+          "nom": "v20",
+          "source": "V20",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 20 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -54.497720494566,
+            "max": 39.4209042482199
+          }
+        },
+        {
+          "nom": "v21",
+          "source": "V21",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 21 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -34.8303821448146,
+            "max": 27.2028391573154
+          }
+        },
+        {
+          "nom": "v22",
+          "source": "V22",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 22 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -10.933143697655,
+            "max": 10.5030900899454
+          }
+        },
+        {
+          "nom": "v23",
+          "source": "V23",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 23 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -44.8077352037913,
+            "max": 22.5284116897749
+          }
+        },
+        {
+          "nom": "v24",
+          "source": "V24",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 24 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -2.83662691870341,
+            "max": 4.58454913689817
+          }
+        },
+        {
+          "nom": "v25",
+          "source": "V25",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 25 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -10.2953970749851,
+            "max": 7.51958867870916
+          }
+        },
+        {
+          "nom": "v26",
+          "source": "V26",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 26 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -2.60455055280817,
+            "max": 3.5173456116238
+          }
+        },
+        {
+          "nom": "v27",
+          "source": "V27",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 27 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -22.5656793207827,
+            "max": 31.6121981061363
+          }
+        },
+        {
+          "nom": "v28",
+          "source": "V28",
+          "type": "decimal",
+          "obligatoire": true,
+          "description": "Composante principale 28 issue d'une analyse en composantes principales, anonymisee par la source.",
+          "classification": "variable_pca",
+          "stats": {
+            "nuls": 0,
+            "distincts": 275663,
+            "min": -15.4300839055349,
+            "max": 33.8478078188831
+          }
+        },
+        {
+          "nom": "montant",
+          "source": "Amount",
+          "type": "decimal",
+          "obligatoire": true,
+          "unite": "euro",
+          "description": "Montant de la transaction.",
+          "classification": "financier",
+          "regles": [
+            {
+              "id": "C03",
+              "type": "minimum",
+              "valeur": 0,
+              "severite": "erreur"
+            },
+            {
+              "id": "C04",
+              "type": "expression",
+              "violation": "montant == 0",
+              "severite": "avertissement",
+              "message": "montant nul, conserve car 27 de ces transactions sont des fraudes"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 32767,
+            "min": 0.0,
+            "max": 25691.16
+          }
+        },
+        {
+          "nom": "classe",
+          "source": "Class",
+          "type": "entier",
+          "obligatoire": true,
+          "description": "Etiquette de fraude, verite terrain (1 fraude).",
+          "classification": "cible",
+          "usage": "cible d'apprentissage, jamais utilisee comme variable",
+          "valeurs": [
+            0,
+            1
+          ],
+          "regles": [
+            {
+              "id": "C05",
+              "type": "valeurs",
+              "severite": "erreur"
+            }
+          ],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2,
+            "min": 0.0,
+            "max": 1.0
+          }
+        },
+        {
+          "nom": "controles_qualite",
+          "type": "texte",
+          "classification": "technique",
+          "description": "Identifiants des regles d'avertissement declenchees, separes par des virgules.",
+          "regles": [],
+          "stats": {
+            "nuls": 0,
+            "distincts": 2
+          }
+        }
+      ]
+    }
+  }
+}

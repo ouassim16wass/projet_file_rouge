@@ -1,0 +1,27 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN useradd --create-home --uid 1000 guardpay
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY commun ./commun
+COPY contrats ./contrats
+COPY qualite ./qualite
+COPY transformation ./transformation
+COPY chargement ./chargement
+COPY catalogue ./catalogue
+COPY ingestion ./ingestion
+COPY exploration ./exploration
+COPY warehouse ./warehouse
+
+RUN mkdir -p /app/data/raw /app/data/processed /app/docs && chown -R guardpay:guardpay /app
+USER guardpay
+
+ENTRYPOINT ["python"]
+CMD ["qualite/nettoyer.py"]
