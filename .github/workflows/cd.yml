@@ -5,32 +5,71 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 jobs:
-  publier-image:
+  verifier:
+    name: 1 Controles d'integration
+    uses: ./.github/workflows/ci.yml
+
+  construire:
+    name: 2 Construction de l'image
+    needs: verifier
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - run: docker build -f infra/Dockerfile.pipeline -t guardpay-pipeline:${{ github.ref_name }} .
+      - run: docker save guardpay-pipeline:${{ github.ref_name }} -o image.tar
+      - uses: actions/upload-artifact@v4
         with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: requirements-dev.txt
-      - run: pip install -r requirements-dev.txt
-      - run: ruff check .
-      - run: pytest -q
-      - name: Connexion au registre
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-      - name: Construction et publication
+          name: image
+          path: image.tar
+          retention-days: 1
+
+  publier:
+    name: 3 Publication dans le registre
+    needs: construire
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: image
+      - run: docker load -i image.tar
+      - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Etiqueter et pousser
         run: |
           IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/guardpay-pipeline
-          docker build -f infra/Dockerfile.pipeline -t "$IMAGE:${GITHUB_REF_NAME}" -t "$IMAGE:latest" .
+          docker tag guardpay-pipeline:${GITHUB_REF_NAME} "$IMAGE:${GITHUB_REF_NAME}"
+          docker tag guardpay-pipeline:${GITHUB_REF_NAME} "$IMAGE:latest"
           docker push "$IMAGE:${GITHUB_REF_NAME}"
           docker push "$IMAGE:latest"
-      - name: Publication de la version
-        env:
+
+  verification-livraison:
+    name: 4 Verification de l'image publiee
+    needs: publier
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/guardpay-pipeline:${GITHUB_REF_NAME}
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "$IMAGE"
+          docker run --rm "$IMAGE" qualite/verifier_contrats.py
+
+  release:
+    name: 5 Version de livraison
+    needs: verification-livraison
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release create "${GITHUB_REF_NAME}" --generate-notes

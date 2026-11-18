@@ -10,18 +10,36 @@
 
 ## Integration continue
 
-| Job | Controle |
-|---|---|
-| `qualite-code` | Lint `ruff`, tests `pytest` (27 tests : contrats, nettoyage, transformations) |
-| `audit-dependances` | `pip-audit` sur les dependances d'execution |
-| `schema-sql` | Application des scripts `warehouse/sql` sur un PostgreSQL de test, erreur bloquante |
-| `compose-et-image` | Validation du `docker-compose.yml` avec tous les profils, construction de l'image du pipeline, import des bibliotheques dans l'image |
+Le workflow `ci.yml` est decoupe en jobs independants, lances en parallele, puis enchaines par dependances :
+
+| Job | Controle | Depend de |
+|---|---|---|
+| 1 Lint | `ruff check` | aucun |
+| 2 Tests unitaires | `pytest` (29 tests : contrats, nettoyage, transformations) | aucun |
+| 3 Contrats de donnees | `qualite/verifier_contrats.py` : structure, identifiants uniques, severites, champs references | aucun |
+| 4 Audit des dependances | `pip-audit` sur les dependances d'execution | aucun |
+| 5 Schema PostgreSQL | Scripts `warehouse/sql` appliques sur un PostgreSQL de test, erreur bloquante | aucun |
+| 6 Configuration Docker Compose | Validation du compose avec tous les profils | aucun |
+| 7 Image du pipeline | Construction, import des bibliotheques, controle des contrats dans l'image | 1, 2, 3, 6 |
+| 8 Bilan | Echoue si un job a echoue ou ete annule | tous |
 
 Les executions concurrentes d'une meme branche sont annulees pour limiter les minutes consommees.
 
+## Controle des donnees
+
+Le workflow `donnees.yml`, lance a la demande, enchaine deux jobs : controle des contrats, puis telechargement du jeu ULB, nettoyage selon le contrat et publication du rapport de qualite comme artefact.
+
 ## Livraison continue
 
-Une release se declenche en poussant un tag : `git tag v0.1.0 && git push origin v0.1.0`. Le workflow rejoue lint et tests, construit `infra/Dockerfile.pipeline`, publie `ghcr.io/<proprietaire>/guardpay-pipeline:<tag>` et `latest`, puis cree la release avec ses notes.
+Le workflow `cd.yml` se declenche en poussant un tag : `git tag v0.1.0 && git push origin v0.1.0`. Il enchaine cinq jobs :
+
+| Job | Action | Depend de |
+|---|---|---|
+| 1 Controles d'integration | Rejoue tout `ci.yml` | aucun |
+| 2 Construction de l'image | Construit l'image et la transmet au job suivant | 1 |
+| 3 Publication | Pousse `ghcr.io/<proprietaire>/guardpay-pipeline:<tag>` et `latest` | 2 |
+| 4 Verification de l'image publiee | Tire l'image depuis le registre et controle les contrats | 3 |
+| 5 Version de livraison | Cree la release avec ses notes | 4 |
 
 Retour arriere : relancer la plateforme avec le tag precedent de l'image.
 

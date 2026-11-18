@@ -4,18 +4,34 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  qualite-code:
+  lint:
+    name: 1 Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: pip install ruff
+      - run: ruff check .
+
+  tests:
+    name: 2 Tests unitaires
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,10 +40,24 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-dev.txt
       - run: pip install -r requirements-dev.txt
-      - run: ruff check .
       - run: pytest -q
 
-  audit-dependances:
+  contrats:
+    name: 3 Contrats de donnees
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: pip install pyyaml
+      - run: python qualite/verifier_contrats.py
+
+  securite:
+    name: 4 Audit des dependances
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -39,6 +69,7 @@ jobs:
       - run: pip-audit -r requirements.txt
 
   schema-sql:
+    name: 5 Schema PostgreSQL
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:
@@ -59,12 +90,34 @@ jobs:
           done
           psql "postgresql://ci:ci@localhost:5432/guardpay" -v ON_ERROR_STOP=1 -c "select count(*) from gold.variables_operation"
 
-  compose-et-image:
+  compose:
+    name: 6 Configuration Docker Compose
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - run: cp .env.example .env
       - run: docker compose --profile streaming --profile batch config -q
+
+  image:
+    name: 7 Image du pipeline
+    needs: [lint, tests, contrats, compose]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
       - run: docker build -f infra/Dockerfile.pipeline -t guardpay-pipeline:ci .
       - run: docker run --rm guardpay-pipeline:ci -c "import pandas, pyarrow, yaml, scipy, psycopg; print('ok')"
+      - run: docker run --rm guardpay-pipeline:ci qualite/verifier_contrats.py
+
+  bilan:
+    name: 8 Bilan
+    needs: [lint, tests, contrats, securite, schema-sql, compose, image]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verifier les resultats
+        run: |
+          echo "${{ join(needs.*.result, ' ') }}"
+          if echo "${{ join(needs.*.result, ' ') }}" | grep -Eq "failure|cancelled"; then exit 1; fi

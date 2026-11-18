@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogue de données GuardPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-2: #f5f7f9;
+  --fg: #16212b;
+  --muted: #5b6875;
+  --line: #d5dbe1;
+  --accent: #0b6e6e;
+  --accent-soft: #d8eeee;
+  --ok: #1d7a46;
+  --ok-soft: #dcf1e4;
+  --warn: #8a5a00;
+  --warn-soft: #fbecc8;
+  --err: #a8261d;
+  --err-soft: #f9dcd9;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-head: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1519;
+    --surface: #172026;
+    --surface-2: #1d2830;
+    --fg: #e6ecf0;
+    --muted: #94a3af;
+    --line: #2a3640;
+    --accent: #4cc2c2;
+    --accent-soft: #14383a;
+    --ok: #5cc98a;
+    --ok-soft: #12301f;
+    --warn: #e5b04a;
+    --warn-soft: #382b0c;
+    --err: #ff8a80;
+    --err-soft: #3d1a17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1519;
+  --surface: #172026;
+  --surface-2: #1d2830;
+  --fg: #e6ecf0;
+  --muted: #94a3af;
+  --line: #2a3640;
+  --accent: #4cc2c2;
+  --accent-soft: #14383a;
+  --ok: #5cc98a;
+  --ok-soft: #12301f;
+  --warn: #e5b04a;
+  --warn-soft: #382b0c;
+  --err: #ff8a80;
+  --err-soft: #3d1a17;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--font-head); font-weight: 600; margin: 0; text-wrap: balance; }
+h1 { font-size: 32px; line-height: 1.15; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; }
+p { margin: 0; }
+code, .mono { font-family: var(--font-mono); font-size: 0.92em; }
+a { color: var(--accent); }
+.head p { color: var(--muted); max-width: 66ch; margin-top: 6px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 14px; }
+.stat b { font-family: var(--font-head); font-size: 24px; display: block; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 13px; }
+.nav { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); }
+.nav button {
+  font: inherit; cursor: pointer; padding: 10px 16px; background: none; color: var(--muted);
+  border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.nav button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab {
+  font: inherit; cursor: pointer; padding: 9px 14px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); border-radius: 6px; text-align: left;
+}
+.tab small { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+.tab[aria-selected="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.grid-eng { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin: 0; }
+.eng { background: var(--surface); padding: 12px 14px; min-width: 0; }
+.eng dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.eng dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.toolbar input[type="search"] {
+  font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface-2); color: var(--fg); min-width: 0; flex: 1 1 220px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: inherit; font-size: 13px; cursor: pointer; padding: 4px 10px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--fg); border-radius: 999px;
+}
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 680px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.ligne { cursor: pointer; }
+tr.ligne:hover td { background: var(--surface-2); }
+tr.detail td { background: var(--surface-2); }
+.detail-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.detail-body h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.pill { display: inline-block; font-size: 12px; font-family: var(--font-mono); padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.erreur, .pill.err { background: var(--err-soft); color: var(--err); }
+.pill.avertissement, .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.neutre { background: var(--accent-soft); color: var(--accent); }
+.lien { font: inherit; background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rules li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.rules .id { font-family: var(--font-mono); font-weight: 500; min-width: 3.2em; }
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.carte { border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.kpi { background: var(--surface-2); border-radius: 6px; padding: 10px 12px; }
+.kpi b { font-family: var(--font-head); font-size: 20px; display: block; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi span { color: var(--muted); font-size: 12px; }
+.barre { height: 8px; background: var(--surface-2); border-radius: 4px; min-width: 80px; overflow: hidden; }
+.barre i { display: block; height: 100%; background: var(--warn); }
+.barre i.erreur { background: var(--err); }
+.playground { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 760px) { .playground { grid-template-columns: minmax(0, 1fr); } }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); min-width: 0; }
+.form input, .form select {
+  font-family: var(--font-mono); font-size: 14px; padding: 7px 9px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--surface-2); color: var(--fg); min-width: 0; width: 100%;
+}
+details.extra { grid-column: 1 / -1; }
+details.extra summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+details.extra .form { margin-top: 10px; }
+.verdict { border-radius: 8px; padding: 16px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; align-self: start; position: sticky; top: 12px; }
+.verdict.ok { background: var(--ok-soft); border-color: var(--ok); }
+.verdict.warn { background: var(--warn-soft); border-color: var(--warn); }
+.verdict.err { background: var(--err-soft); border-color: var(--err); }
+.verdict h3 { font-size: 20px; }
+.verdict.ok h3 { color: var(--ok); }
+.verdict.warn h3 { color: var(--warn); }
+.verdict.err h3 { color: var(--err); }
+.note { color: var(--muted); font-size: 13px; }
+.foot { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+@media (prefers-reduced-motion: no-preference) { .tab, .chip, .nav button { transition: background 0.12s, border-color 0.12s, color 0.12s; } }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="head">
+    <h1>Catalogue de données GuardPay</h1>
+    <p>Inventaire des jeux de données de la plateforme de détection de fraude de la Banque Aurore : où ils vivent, d'où ils viennent, ce qu'ils contiennent, quel contrat les encadre et quelle est leur qualité mesurée.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <nav class="nav" role="tablist" id="nav" aria-label="Sections du catalogue"></nav>
+
+  <section id="vue-jeux" class="panel-vue">
+    <div class="panel">
+      <h2>Jeux de données</h2>
+      <div class="toolbar">
+        <input type="search" id="rech-jeux" placeholder="Rechercher un jeu, une couche, un stockage" aria-label="Rechercher un jeu de données">
+        <div class="chips" id="chips-couche" role="group" aria-label="Filtrer par couche"></div>
+        <div class="chips" id="chips-statut" role="group" aria-label="Filtrer par statut"></div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>ID</th><th>Jeu</th><th>Couche</th><th>Statut</th><th>Source</th><th>Clé</th><th>Sensibilité</th><th>Rétention</th></tr></thead>
+          <tbody id="corps-jeux"></tbody>
+        </table>
+      </div>
+      <p class="note" id="compte-jeux"></p>
+    </div>
+    <div class="panel" style="margin-top: 22px">
+      <h2>Sources externes</h2>
+      <div class="cartes" id="sources"></div>
+    </div>
+  </section>
+
+  <section id="vue-dico" class="panel-vue" hidden>
+    <div class="panel">
+      <h2>Dictionnaire et contrat</h2>
+      <div class="tabs" id="tabs" role="tablist" aria-label="Contrats"></div>
+      <p id="desc-contrat"></p>
+      <dl class="grid-eng" id="eng"></dl>
+      <p class="note" id="actions"></p>
+      <div class="toolbar">
+        <input type="search" id="recherche" placeholder="Rechercher un champ, une règle, un mot" aria-label="Rechercher dans les champs">
+        <div class="chips" id="chips" role="group" aria-label="Filtrer par classification"></div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Champ</th><th>Source</th><th>Type</th><th>Classification</th><th>Règles</th></tr></thead>
+          <tbody id="corps"></tbody>
+        </table>
+      </div>
+      <p class="note" id="compte"></p>
+      <h3>Règles portant sur la table</h3>
+      <ul class="rules" id="regles-table"></ul>
+    </div>
+  </section>
+
+  <section id="vue-qualite" class="panel-vue" hidden>
+    <div class="panel" id="qualite"></div>
+  </section>
+
+  <section id="vue-test" class="panel-vue" hidden>
+    <div class="panel">
+      <h2>Tester une opération contre le contrat</h2>
+      <div class="tabs" id="tabs-test" role="tablist" aria-label="Contrat testé"></div>
+      <p class="note">Les valeurs saisies sont évaluées avec les mêmes règles que le nettoyage. Les règles d'unicité portent sur tout le lot et ne se testent pas sur une seule ligne.</p>
+      <div class="presets" id="presets" role="group" aria-label="Exemples"></div>
+      <div class="playground">
+        <div class="form" id="formulaire"></div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot" id="pied"></footer>
+</div>
+
+<script>
+const DONNEES = {"jeux": [{"id": "D01", "nom": "operations_brutes", "couche": "bronze", "stockage": "Kafka operations.brutes + Parquet data/processed/bronze", "source": "PaySim (S1)", "cle": "id_operation", "frequence": "continue", "sensibilite": "moyenne", "retention": "1 an", "proprietaire": "equipe-donnees-guardpay", "contrat": "guardpay.operations", "statut": "realise", "description": "Evenements recus tels quels avec metadonnees Kafka."}, {"id": "D02", "nom": "operations_propres", "couche": "silver", "stockage": "Parquet data/processed/silver/operations.parquet", "source": "D01", "cle": "id_operation", "frequence": "continue", "sensibilite": "moyenne", "retention": "1 an", "proprietaire": "equipe-donnees-guardpay", "contrat": "guardpay.operations", "statut": "realise", "description": "Operations validees par le contrat, comptes pseudonymises, drapeaux de qualite."}, {"id": "D03", "nom": "variables_operation", "couche": "gold", "stockage": "Parquet data/processed/gold + PostgreSQL gold.variables_operation", "source": "D02", "cle": "id_operation", "frequence": "continue", "sensibilite": "moyenne", "retention": "par version du modele", "proprietaire": "equipe-donnees-guardpay", "contrat": "a definir", "statut": "realise en lot", "description": "Variables calculees pour le modele."}, {"id": "D04", "nom": "scores_operations", "couche": "gold", "stockage": "PostgreSQL", "source": "D03, modele", "cle": "id_operation", "frequence": "continue", "sensibilite": "moyenne", "retention": "2 ans", "proprietaire": "equipe-donnees-guardpay", "contrat": "a definir", "statut": "prevu", "description": "Score de risque et explication par operation."}, {"id": "D05", "nom": "alertes", "couche": "gold", "stockage": "MongoDB", "source": "D04", "cle": "id_alerte", "frequence": "continue", "sensibilite": "moyenne", "retention": "2 ans", "proprietaire": "equipe-donnees-guardpay", "contrat": "a definir", "statut": "prevu", "description": "Alertes presentees aux analystes."}, {"id": "D06", "nom": "dossiers_investigation", "couche": "gold", "stockage": "MongoDB", "source": "D05", "cle": "id_dossier", "frequence": "a la decision", "sensibilite": "moyenne", "retention": "5 ans", "proprietaire": "equipe-donnees-guardpay", "contrat": "a definir", "statut": "prevu", "description": "Decisions et notes des analystes."}, {"id": "D07", "nom": "operations_rejetees", "couche": "quarantaine", "stockage": "Kafka operations.rejetees + Parquet data/processed/quarantaine", "source": "D01", "cle": "id_operation", "frequence": "continue", "sensibilite": "faible", "retention": "90 jours", "proprietaire": "equipe-donnees-guardpay", "contrat": "guardpay.operations", "statut": "realise", "description": "Lignes ecartees avec la liste des regles violees."}, {"id": "D08", "nom": "indicateurs_horaires", "couche": "gold", "stockage": "Parquet data/processed/gold + PostgreSQL gold.indicateurs_horaires", "source": "D02", "cle": "pas + type", "frequence": "horaire", "sensibilite": "faible", "retention": "duree du service", "proprietaire": "equipe-donnees-guardpay", "contrat": "a definir", "statut": "realise en lot", "description": "Volumes, taux d'alerte et de rejet par heure."}, {"id": "D09", "nom": "creditcard_ulb", "couche": "silver", "stockage": "Parquet data/processed/silver/transactions_cartes.parquet", "source": "ULB (S2)", "cle": "id_transaction", "frequence": "statique", "sensibilite": "faible", "retention": "duree du projet", "proprietaire": "equipe-donnees-guardpay", "contrat": "guardpay.transactions_cartes", "statut": "realise", "description": "284 807 transactions reelles anonymisees (variables PCA), validation du modele."}, {"id": "D10", "nom": "modeles", "couche": "registre", "stockage": "MLflow", "source": "entrainement", "cle": "version", "frequence": "a chaque entrainement", "sensibilite": "faible", "retention": "toutes versions", "proprietaire": "equipe-donnees-guardpay", "contrat": "n/a", "statut": "prevu", "description": "Modeles, parametres, metriques, artefacts."}], "sources": [{"id": "S1", "nom": "PaySim", "url": "https://huggingface.co/datasets/theman10/paysim/resolve/main/paysim.csv", "origine": "Kaggle ealaxi/paysim1", "licence": "a verifier a la source d'origine", "nature": "synthetique"}, {"id": "S2", "nom": "Fraude carte ULB", "url": "https://openml.org/data/v1/download/1673544/creditcard.arff", "origine": "ULB Machine Learning Group", "licence": "a verifier a la source d'origine", "nature": "reelle anonymisee"}], "contrats": [{"contrat": {"id": "guardpay.operations", "version": "1.0.0", "statut": "actif", "jeu_de_donnees": "D01-D02 operations", "description": "Operations bancaires rejouees en continu depuis PaySim, telles que recues par la plateforme GuardPay.", "proprietaire": "equipe-donnees-guardpay", "consommateurs": ["streaming-silver", "ml-entrainement", "api-scoring", "dashboards"], "source": {"nom": "PaySim", "url": "https://huggingface.co/datasets/theman10/paysim/resolve/main/paysim.csv", "origine": "Kaggle ealaxi/paysim1", "licence": "a verifier a la source d'origine", "nature": "donnees synthetiques, aucune donnee personnelle reelle"}, "fraicheur": {"livraison": "continue, un pas de temps par intervalle de rejeu", "delai_max_ingestion_secondes": 60}, "volumetrie": {"lignes_attendues": 6362620, "pas_de_temps": 743, "max_operations_par_pas": 51352}, "retention": "1 an", "evolution": {"compatibilite": "ajout de champ optionnel autorise, suppression ou changement de type = nouvelle version majeure", "notification": "revue du contrat avant tout changement de schema"}}, "entree": {"fichier": "data/raw/paysim.csv", "format": "csv", "cle": "id_operation", "cible": "est_fraude", "silver": "data/processed/silver/operations.parquet", "quarantaine": "data/processed/quarantaine/operations_rejetees.parquet", "rapport_json": "data/processed/rapport_qualite.json", "rapport_md": "docs/rapport_qualite.md"}, "champs": [{"nom": "id_operation", "source": "genere", "type": "entier", "obligatoire": true, "unique": true, "description": "Numero de ligne du fichier source, cle d'idempotence ajoutee a l'ingestion.", "classification": "technique", "regles": [{"id": "R01", "type": "minimum", "valeur": 1, "severite": "erreur"}]}, {"nom": "pas", "source": "step", "type": "entier", "obligatoire": true, "description": "Pas de temps horaire, 1 correspond a la premiere heure.", "classification": "technique", "regles": [{"id": "R02", "type": "plage", "min": 1, "max": 743, "severite": "erreur"}]}, {"nom": "type", "source": "type", "type": "texte", "obligatoire": true, "description": "Nature de l'operation.", "classification": "metier", "valeurs": ["PAYMENT", "TRANSFER", "CASH_OUT", "DEBIT", "CASH_IN"], "regles": [{"id": "R03", "type": "valeurs", "severite": "erreur"}]}, {"nom": "montant", "source": "amount", "type": "decimal", "obligatoire": true, "unite": "unite monetaire de la banque", "description": "Montant de l'operation.", "classification": "financier", "regles": [{"id": "R04", "type": "minimum", "valeur": 0, "severite": "erreur"}, {"id": "R05", "type": "expression", "violation": "montant == 0", "severite": "avertissement", "message": "montant nul, conserve car ces 16 operations sont des fraudes"}]}, {"nom": "emetteur", "source": "nameOrig", "type": "texte", "obligatoire": true, "description": "Compte emetteur, pseudonymise par hachage sale en silver.", "classification": "identifiant", "pseudonymise": true, "format": "^C[0-9]+$", "regles": [{"id": "R06", "type": "format", "severite": "erreur"}]}, {"nom": "solde_emetteur_avant", "source": "oldbalanceOrg", "type": "decimal", "obligatoire": true, "description": "Solde de l'emetteur avant l'operation.", "classification": "financier", "regles": [{"id": "R07", "type": "minimum", "valeur": 0, "severite": "erreur"}]}, {"nom": "solde_emetteur_apres", "source": "newbalanceOrig", "type": "decimal", "obligatoire": true, "description": "Solde de l'emetteur apres l'operation.", "classification": "financier", "regles": [{"id": "R08", "type": "minimum", "valeur": 0, "severite": "erreur"}]}, {"nom": "destinataire", "source": "nameDest", "type": "texte", "obligatoire": true, "description": "Compte destinataire (C client, M marchand), pseudonymise par hachage sale en silver.", "classification": "identifiant", "pseudonymise": true, "format": "^[CM][0-9]+$", "regles": [{"id": "R09", "type": "format", "severite": "erreur"}]}, {"nom": "solde_destinataire_avant", "source": "oldbalanceDest", "type": "decimal", "obligatoire": true, "description": "Solde du destinataire avant l'operation, nul pour les marchands.", "classification": "financier", "regles": [{"id": "R10", "type": "minimum", "valeur": 0, "severite": "erreur"}]}, {"nom": "solde_destinataire_apres", "source": "newbalanceDest", "type": "decimal", "obligatoire": true, "description": "Solde du destinataire apres l'operation, nul pour les marchands.", "classification": "financier", "regles": [{"id": "R11", "type": "minimum", "valeur": 0, "severite": "erreur"}]}, {"nom": "est_fraude", "source": "isFraud", "type": "entier", "obligatoire": true, "description": "Etiquette de fraude, verite terrain.", "classification": "cible", "usage": "cible d'apprentissage, jamais utilisee comme variable", "valeurs": [0, 1], "regles": [{"id": "R12", "type": "valeurs", "severite": "erreur"}]}, {"nom": "signalement_regle_existante", "source": "isFlaggedFraud", "type": "entier", "obligatoire": true, "description": "Signalement par la regle metier existante du simulateur, 16 lignes sur 6 362 620.", "classification": "reference", "usage": "reference de comparaison uniquement, jamais utilisee comme variable", "valeurs": [0, 1], "regles": [{"id": "R13", "type": "valeurs", "severite": "erreur"}]}], "regles_table": [{"id": "R20", "nom": "unicite_id_operation", "type": "unicite", "champs": ["id_operation"], "severite": "erreur"}, {"id": "R21", "nom": "unicite_cle_metier", "type": "unicite", "champs": ["pas", "emetteur", "destinataire", "montant"], "severite": "erreur"}, {"id": "R22", "nom": "pas_auto_virement", "type": "expression", "violation": "emetteur == destinataire", "severite": "erreur"}, {"id": "R30", "nom": "solde_emetteur_non_suivi", "type": "expression", "violation": "type != 'CASH_IN' and solde_emetteur_avant == 0 and solde_emetteur_apres == 0", "severite": "avertissement", "message": "solde de l'emetteur a zero avant et apres, solde non suivi par la source"}, {"id": "R31", "nom": "debit_plafonne", "type": "expression", "violation": "type != 'CASH_IN' and montant > solde_emetteur_avant + 0.01 and solde_emetteur_apres == 0 and solde_emetteur_avant > 0", "severite": "avertissement", "message": "montant superieur au solde, solde ramene a zero par la source"}, {"id": "R32", "nom": "ecart_solde_emetteur", "type": "expression", "violation": "abs(solde_emetteur_avant - montant - solde_emetteur_apres) > 0.01 and type != 'CASH_IN' and not (solde_emetteur_avant == 0 and solde_emetteur_apres == 0) and not (montant > solde_emetteur_avant + 0.01 and solde_emetteur_apres == 0)", "severite": "avertissement", "message": "ecart residuel entre solde avant, montant et solde apres"}], "qualite_globale": {"taux_rejet_max": 0.001, "taux_avertissement_info": "suivi sans seuil bloquant", "actions": {"erreur": "ligne ecartee vers la quarantaine avec la liste des regles violees", "avertissement": "ligne conservee, drapeau ajoute dans la colonne controles_qualite"}}, "fichier": "contrats/operations.yaml", "exemple": {"base": {"pas": 1, "type": "TRANSFER", "montant": 181, "emetteur": "C1305486145", "solde_emetteur_avant": 181, "solde_emetteur_apres": 0, "destinataire": "C553264065", "solde_destinataire_avant": 0, "solde_destinataire_apres": 0, "est_fraude": 1, "signalement_regle_existante": 0}, "cas": [{"nom": "Paiement normal", "valeurs": {"type": "PAYMENT", "montant": 1864.28, "solde_emetteur_avant": 21249, "solde_emetteur_apres": 19384.72, "destinataire": "M2044282225", "est_fraude": 0}}, {"nom": "Montant nul", "valeurs": {"type": "CASH_OUT", "montant": 0, "solde_emetteur_avant": 0, "solde_emetteur_apres": 0}}, {"nom": "Solde non suivi", "valeurs": {"type": "PAYMENT", "montant": 100, "solde_emetteur_avant": 0, "solde_emetteur_apres": 0, "destinataire": "M1", "est_fraude": 0}}, {"nom": "Débit plafonné", "valeurs": {"type": "CASH_OUT", "montant": 900, "solde_emetteur_avant": 500, "solde_emetteur_apres": 0}}, {"nom": "Pas hors plage", "valeurs": {"pas": 800}}, {"nom": "Type inconnu", "valeurs": {"type": "VIREMENT"}}, {"nom": "Montant négatif", "valeurs": {"montant": -5}}, {"nom": "Compte mal formé", "valeurs": {"emetteur": "X12"}}, {"nom": "Auto-virement", "valeurs": {"destinataire": "C1305486145"}}]}, "champs_catalogue": [{"nom": "id_operation", "source": "genere", "type": "entier", "obligatoire": true, "unique": true, "description": "Numero de ligne du fichier source, cle d'idempotence ajoutee a l'ingestion.", "classification": "technique", "regles": [{"id": "R01", "type": "minimum", "valeur": 1, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 6362620, "min": 1.0, "max": 6362620.0}}, {"nom": "pas", "source": "step", "type": "entier", "obligatoire": true, "description": "Pas de temps horaire, 1 correspond a la premiere heure.", "classification": "technique", "regles": [{"id": "R02", "type": "plage", "min": 1, "max": 743, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 743, "min": 1.0, "max": 743.0}}, {"nom": "type", "source": "type", "type": "texte", "obligatoire": true, "description": "Nature de l'operation.", "classification": "metier", "valeurs": ["PAYMENT", "TRANSFER", "CASH_OUT", "DEBIT", "CASH_IN"], "regles": [{"id": "R03", "type": "valeurs", "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 5}}, {"nom": "montant", "source": "amount", "type": "decimal", "obligatoire": true, "unite": "unite monetaire de la banque", "description": "Montant de l'operation.", "classification": "financier", "regles": [{"id": "R04", "type": "minimum", "valeur": 0, "severite": "erreur"}, {"id": "R05", "type": "expression", "violation": "montant == 0", "severite": "avertissement", "message": "montant nul, conserve car ces 16 operations sont des fraudes"}], "stats": {"nuls": 0, "distincts": 5316900, "min": 0.0, "max": 92445516.64}}, {"nom": "emetteur", "source": "nameOrig", "type": "texte", "obligatoire": true, "description": "Compte emetteur, pseudonymise par hachage sale en silver.", "classification": "identifiant", "pseudonymise": true, "format": "^C[0-9]+$", "regles": [{"id": "R06", "type": "format", "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 6353307}}, {"nom": "solde_emetteur_avant", "source": "oldbalanceOrg", "type": "decimal", "obligatoire": true, "description": "Solde de l'emetteur avant l'operation.", "classification": "financier", "regles": [{"id": "R07", "type": "minimum", "valeur": 0, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 1845844, "min": 0.0, "max": 59585040.37}}, {"nom": "solde_emetteur_apres", "source": "newbalanceOrig", "type": "decimal", "obligatoire": true, "description": "Solde de l'emetteur apres l'operation.", "classification": "financier", "regles": [{"id": "R08", "type": "minimum", "valeur": 0, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 2682586, "min": 0.0, "max": 49585040.37}}, {"nom": "destinataire", "source": "nameDest", "type": "texte", "obligatoire": true, "description": "Compte destinataire (C client, M marchand), pseudonymise par hachage sale en silver.", "classification": "identifiant", "pseudonymise": true, "format": "^[CM][0-9]+$", "regles": [{"id": "R09", "type": "format", "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 2722362}}, {"nom": "solde_destinataire_avant", "source": "oldbalanceDest", "type": "decimal", "obligatoire": true, "description": "Solde du destinataire avant l'operation, nul pour les marchands.", "classification": "financier", "regles": [{"id": "R10", "type": "minimum", "valeur": 0, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 3614697, "min": 0.0, "max": 356015889.35}}, {"nom": "solde_destinataire_apres", "source": "newbalanceDest", "type": "decimal", "obligatoire": true, "description": "Solde du destinataire apres l'operation, nul pour les marchands.", "classification": "financier", "regles": [{"id": "R11", "type": "minimum", "valeur": 0, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 3555499, "min": 0.0, "max": 356179278.92}}, {"nom": "est_fraude", "source": "isFraud", "type": "entier", "obligatoire": true, "description": "Etiquette de fraude, verite terrain.", "classification": "cible", "usage": "cible d'apprentissage, jamais utilisee comme variable", "valeurs": [0, 1], "regles": [{"id": "R12", "type": "valeurs", "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 2, "min": 0.0, "max": 1.0}}, {"nom": "signalement_regle_existante", "source": "isFlaggedFraud", "type": "entier", "obligatoire": true, "description": "Signalement par la regle metier existante du simulateur, 16 lignes sur 6 362 620.", "classification": "reference", "usage": "reference de comparaison uniquement, jamais utilisee comme variable", "valeurs": [0, 1], "regles": [{"id": "R13", "type": "valeurs", "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 2, "min": 0.0, "max": 1.0}}, {"nom": "type_destinataire", "type": "texte", "classification": "derive", "description": "client ou marchand, deduit du prefixe du compte destinataire.", "regles": [], "stats": {"nuls": 0, "distincts": 2}}, {"nom": "controles_qualite", "type": "texte", "classification": "technique", "description": "Identifiants des regles d'avertissement declenchees, separes par des virgules.", "regles": [], "stats": {"nuls": 0, "distincts": 5}}], "rapport": {"contrat": "guardpay.operations", "version_contrat": "1.0.0", "lignes_lues": 6362620, "lignes_silver": 6362620, "lignes_quarantaine": 0, "taux_rejet": 0.0, "seuil_rejet": 0.001, "conforme": true, "lignes_attendues": 6362620, "volume_conforme": true, "fraudes_lues": 8213, "fraudes_silver": 8213, "duree_secondes": 23.7, "regles": [{"regle": "NUL_id_operation", "severite": "erreur", "message": "id_operation manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R01", "severite": "erreur", "message": "id_operation minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_pas", "severite": "erreur", "message": "pas manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R02", "severite": "erreur", "message": "pas plage", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_type", "severite": "erreur", "message": "type manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R03", "severite": "erreur", "message": "type valeurs", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_montant", "severite": "erreur", "message": "montant manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R04", "severite": "erreur", "message": "montant minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R05", "severite": "avertissement", "message": "montant nul, conserve car ces 16 operations sont des fraudes", "lignes": 16, "dont_fraudes": 16, "taux": 2.51468734577894e-06}, {"regle": "NUL_emetteur", "severite": "erreur", "message": "emetteur manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R06", "severite": "erreur", "message": "emetteur format", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_solde_emetteur_avant", "severite": "erreur", "message": "solde_emetteur_avant manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R07", "severite": "erreur", "message": "solde_emetteur_avant minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_solde_emetteur_apres", "severite": "erreur", "message": "solde_emetteur_apres manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R08", "severite": "erreur", "message": "solde_emetteur_apres minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_destinataire", "severite": "erreur", "message": "destinataire manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R09", "severite": "erreur", "message": "destinataire format", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_solde_destinataire_avant", "severite": "erreur", "message": "solde_destinataire_avant manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R10", "severite": "erreur", "message": "solde_destinataire_avant minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_solde_destinataire_apres", "severite": "erreur", "message": "solde_destinataire_apres manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R11", "severite": "erreur", "message": "solde_destinataire_apres minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_est_fraude", "severite": "erreur", "message": "est_fraude manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R12", "severite": "erreur", "message": "est_fraude valeurs", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_signalement_regle_existante", "severite": "erreur", "message": "signalement_regle_existante manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R13", "severite": "erreur", "message": "signalement_regle_existante valeurs", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R20", "severite": "erreur", "message": "unicite_id_operation", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R21", "severite": "erreur", "message": "unicite_cle_metier", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R22", "severite": "erreur", "message": "pas_auto_virement", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "R30", "severite": "avertissement", "message": "solde de l'emetteur a zero avant et apres, solde non suivi par la source", "lignes": 2088985, "dont_fraudes": 41, "taux": 0.3283215090638762}, {"regle": "R31", "severite": "avertissement", "message": "montant superieur au solde, solde ramene a zero par la source", "lignes": 1512573, "dont_fraudes": 4, "taux": 0.23772801141668054}, {"regle": "R32", "severite": "avertissement", "message": "ecart residuel entre solde avant, montant et solde apres", "lignes": 76866, "dont_fraudes": 16, "taux": 0.012080872345040251}]}}, {"contrat": {"id": "guardpay.transactions_cartes", "version": "1.0.0", "statut": "actif", "jeu_de_donnees": "D09 creditcard_ulb", "description": "Transactions par carte reelles et anonymisees, utilisees pour valider le modele de detection.", "proprietaire": "equipe-donnees-guardpay", "consommateurs": ["ml-entrainement", "ml-evaluation"], "source": {"nom": "Fraude carte ULB", "url": "https://openml.org/data/v1/download/1673544/creditcard.arff", "origine": "ULB Machine Learning Group", "licence": "a verifier a la source d'origine", "nature": "donnees reelles anonymisees, variables PCA"}, "fraicheur": {"livraison": "statique, deux jours de septembre 2013"}, "volumetrie": {"lignes_attendues": 284807}, "retention": "duree du projet", "evolution": {"compatibilite": "jeu statique, tout changement de schema = nouvelle version majeure", "notification": "revue du contrat avant tout changement de schema"}}, "entree": {"fichier": "data/raw/creditcard.arff", "format": "arff", "cle": "id_transaction", "cible": "classe", "silver": "data/processed/silver/transactions_cartes.parquet", "quarantaine": "data/processed/quarantaine/transactions_cartes_rejetees.parquet", "rapport_json": "data/processed/rapport_qualite_cartes.json", "rapport_md": "docs/rapport_qualite_cartes.md"}, "champs": [{"nom": "id_transaction", "source": "genere", "type": "entier", "obligatoire": true, "unique": true, "description": "Numero de ligne du fichier source, cle technique ajoutee a l'ingestion.", "classification": "technique", "regles": [{"id": "C01", "type": "minimum", "valeur": 1, "severite": "erreur"}]}, {"nom": "temps", "source": "Time", "type": "decimal", "obligatoire": true, "unite": "secondes depuis la premiere transaction", "description": "Delai ecoule depuis la premiere transaction du jeu, sur deux jours.", "classification": "technique", "regles": [{"id": "C02", "type": "plage", "min": 0, "max": 172792, "severite": "erreur"}]}, {"nom": "v1", "source": "V1", "type": "decimal", "obligatoire": true, "description": "Composante principale 1 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v2", "source": "V2", "type": "decimal", "obligatoire": true, "description": "Composante principale 2 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v3", "source": "V3", "type": "decimal", "obligatoire": true, "description": "Composante principale 3 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v4", "source": "V4", "type": "decimal", "obligatoire": true, "description": "Composante principale 4 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v5", "source": "V5", "type": "decimal", "obligatoire": true, "description": "Composante principale 5 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v6", "source": "V6", "type": "decimal", "obligatoire": true, "description": "Composante principale 6 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v7", "source": "V7", "type": "decimal", "obligatoire": true, "description": "Composante principale 7 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v8", "source": "V8", "type": "decimal", "obligatoire": true, "description": "Composante principale 8 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v9", "source": "V9", "type": "decimal", "obligatoire": true, "description": "Composante principale 9 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v10", "source": "V10", "type": "decimal", "obligatoire": true, "description": "Composante principale 10 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v11", "source": "V11", "type": "decimal", "obligatoire": true, "description": "Composante principale 11 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v12", "source": "V12", "type": "decimal", "obligatoire": true, "description": "Composante principale 12 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v13", "source": "V13", "type": "decimal", "obligatoire": true, "description": "Composante principale 13 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v14", "source": "V14", "type": "decimal", "obligatoire": true, "description": "Composante principale 14 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v15", "source": "V15", "type": "decimal", "obligatoire": true, "description": "Composante principale 15 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v16", "source": "V16", "type": "decimal", "obligatoire": true, "description": "Composante principale 16 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v17", "source": "V17", "type": "decimal", "obligatoire": true, "description": "Composante principale 17 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v18", "source": "V18", "type": "decimal", "obligatoire": true, "description": "Composante principale 18 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v19", "source": "V19", "type": "decimal", "obligatoire": true, "description": "Composante principale 19 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v20", "source": "V20", "type": "decimal", "obligatoire": true, "description": "Composante principale 20 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v21", "source": "V21", "type": "decimal", "obligatoire": true, "description": "Composante principale 21 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v22", "source": "V22", "type": "decimal", "obligatoire": true, "description": "Composante principale 22 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v23", "source": "V23", "type": "decimal", "obligatoire": true, "description": "Composante principale 23 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v24", "source": "V24", "type": "decimal", "obligatoire": true, "description": "Composante principale 24 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v25", "source": "V25", "type": "decimal", "obligatoire": true, "description": "Composante principale 25 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v26", "source": "V26", "type": "decimal", "obligatoire": true, "description": "Composante principale 26 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v27", "source": "V27", "type": "decimal", "obligatoire": true, "description": "Composante principale 27 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "v28", "source": "V28", "type": "decimal", "obligatoire": true, "description": "Composante principale 28 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca"}, {"nom": "montant", "source": "Amount", "type": "decimal", "obligatoire": true, "unite": "euro", "description": "Montant de la transaction.", "classification": "financier", "regles": [{"id": "C03", "type": "minimum", "valeur": 0, "severite": "erreur"}, {"id": "C04", "type": "expression", "violation": "montant == 0", "severite": "avertissement", "message": "montant nul, conserve car 27 de ces transactions sont des fraudes"}]}, {"nom": "classe", "source": "Class", "type": "entier", "obligatoire": true, "description": "Etiquette de fraude, verite terrain (1 fraude).", "classification": "cible", "usage": "cible d'apprentissage, jamais utilisee comme variable", "valeurs": [0, 1], "regles": [{"id": "C05", "type": "valeurs", "severite": "erreur"}]}], "regles_table": [{"id": "C20", "nom": "unicite_ligne_complete", "type": "unicite", "champs": ["temps", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23", "v24", "v25", "v26", "v27", "v28", "montant", "classe"], "severite": "erreur", "message": "transaction strictement identique a une autre, 1081 doublons dont 19 fraudes, ecartes pour eviter toute fuite entre apprentissage et test"}, {"id": "C21", "nom": "unicite_id_transaction", "type": "unicite", "champs": ["id_transaction"], "severite": "erreur"}], "qualite_globale": {"taux_rejet_max": 0.01, "actions": {"erreur": "ligne ecartee vers la quarantaine avec la liste des regles violees", "avertissement": "ligne conservee, drapeau ajoute dans la colonne controles_qualite"}}, "fichier": "contrats/creditcard.yaml", "exemple": {"base": {"temps": 406, "montant": 149.62, "classe": 0, "v1": 0, "v2": 0, "v3": 0, "v4": 0, "v5": 0, "v6": 0, "v7": 0, "v8": 0, "v9": 0, "v10": 0, "v11": 0, "v12": 0, "v13": 0, "v14": 0, "v15": 0, "v16": 0, "v17": 0, "v18": 0, "v19": 0, "v20": 0, "v21": 0, "v22": 0, "v23": 0, "v24": 0, "v25": 0, "v26": 0, "v27": 0, "v28": 0}, "cas": [{"nom": "Montant nul", "valeurs": {"montant": 0}}, {"nom": "Temps hors plage", "valeurs": {"temps": 999999}}, {"nom": "Montant négatif", "valeurs": {"montant": -3}}, {"nom": "Classe invalide", "valeurs": {"classe": 3}}]}, "champs_catalogue": [{"nom": "id_transaction", "source": "genere", "type": "entier", "obligatoire": true, "unique": true, "description": "Numero de ligne du fichier source, cle technique ajoutee a l'ingestion.", "classification": "technique", "regles": [{"id": "C01", "type": "minimum", "valeur": 1, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 283726, "min": 1.0, "max": 284807.0}}, {"nom": "temps", "source": "Time", "type": "decimal", "obligatoire": true, "unite": "secondes depuis la premiere transaction", "description": "Delai ecoule depuis la premiere transaction du jeu, sur deux jours.", "classification": "technique", "regles": [{"id": "C02", "type": "plage", "min": 0, "max": 172792, "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 124592, "min": 0.0, "max": 172792.0}}, {"nom": "v1", "source": "V1", "type": "decimal", "obligatoire": true, "description": "Composante principale 1 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -56.407509631329, "max": 2.45492999121121}}, {"nom": "v2", "source": "V2", "type": "decimal", "obligatoire": true, "description": "Composante principale 2 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -72.7157275629303, "max": 22.0577289904909}}, {"nom": "v3", "source": "V3", "type": "decimal", "obligatoire": true, "description": "Composante principale 3 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -48.3255893623954, "max": 9.38255843282114}}, {"nom": "v4", "source": "V4", "type": "decimal", "obligatoire": true, "description": "Composante principale 4 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -5.68317119816995, "max": 16.8753440335975}}, {"nom": "v5", "source": "V5", "type": "decimal", "obligatoire": true, "description": "Composante principale 5 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -113.743306711146, "max": 34.8016658766686}}, {"nom": "v6", "source": "V6", "type": "decimal", "obligatoire": true, "description": "Composante principale 6 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -26.1605059358433, "max": 73.3016255459646}}, {"nom": "v7", "source": "V7", "type": "decimal", "obligatoire": true, "description": "Composante principale 7 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -43.5572415712451, "max": 120.589493945238}}, {"nom": "v8", "source": "V8", "type": "decimal", "obligatoire": true, "description": "Composante principale 8 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -73.2167184552674, "max": 20.0072083651213}}, {"nom": "v9", "source": "V9", "type": "decimal", "obligatoire": true, "description": "Composante principale 9 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -13.4340663182301, "max": 15.5949946071278}}, {"nom": "v10", "source": "V10", "type": "decimal", "obligatoire": true, "description": "Composante principale 10 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -24.5882624372475, "max": 23.7451361206545}}, {"nom": "v11", "source": "V11", "type": "decimal", "obligatoire": true, "description": "Composante principale 11 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -4.79747346479757, "max": 12.0189131816199}}, {"nom": "v12", "source": "V12", "type": "decimal", "obligatoire": true, "description": "Composante principale 12 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -18.6837146333443, "max": 7.8483920756446}}, {"nom": "v13", "source": "V13", "type": "decimal", "obligatoire": true, "description": "Composante principale 13 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -5.79188120632084, "max": 7.12688295859376}}, {"nom": "v14", "source": "V14", "type": "decimal", "obligatoire": true, "description": "Composante principale 14 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -19.2143254902614, "max": 10.5267660517847}}, {"nom": "v15", "source": "V15", "type": "decimal", "obligatoire": true, "description": "Composante principale 15 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -4.49894467676621, "max": 8.87774159774277}}, {"nom": "v16", "source": "V16", "type": "decimal", "obligatoire": true, "description": "Composante principale 16 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -14.1298545174931, "max": 17.3151115176278}}, {"nom": "v17", "source": "V17", "type": "decimal", "obligatoire": true, "description": "Composante principale 17 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -25.1627993693248, "max": 9.25352625047285}}, {"nom": "v18", "source": "V18", "type": "decimal", "obligatoire": true, "description": "Composante principale 18 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -9.49874592104677, "max": 5.04106918541184}}, {"nom": "v19", "source": "V19", "type": "decimal", "obligatoire": true, "description": "Composante principale 19 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -7.21352743017759, "max": 5.59197142733558}}, {"nom": "v20", "source": "V20", "type": "decimal", "obligatoire": true, "description": "Composante principale 20 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -54.497720494566, "max": 39.4209042482199}}, {"nom": "v21", "source": "V21", "type": "decimal", "obligatoire": true, "description": "Composante principale 21 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -34.8303821448146, "max": 27.2028391573154}}, {"nom": "v22", "source": "V22", "type": "decimal", "obligatoire": true, "description": "Composante principale 22 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -10.933143697655, "max": 10.5030900899454}}, {"nom": "v23", "source": "V23", "type": "decimal", "obligatoire": true, "description": "Composante principale 23 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -44.8077352037913, "max": 22.5284116897749}}, {"nom": "v24", "source": "V24", "type": "decimal", "obligatoire": true, "description": "Composante principale 24 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -2.83662691870341, "max": 4.58454913689817}}, {"nom": "v25", "source": "V25", "type": "decimal", "obligatoire": true, "description": "Composante principale 25 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -10.2953970749851, "max": 7.51958867870916}}, {"nom": "v26", "source": "V26", "type": "decimal", "obligatoire": true, "description": "Composante principale 26 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -2.60455055280817, "max": 3.5173456116238}}, {"nom": "v27", "source": "V27", "type": "decimal", "obligatoire": true, "description": "Composante principale 27 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -22.5656793207827, "max": 31.6121981061363}}, {"nom": "v28", "source": "V28", "type": "decimal", "obligatoire": true, "description": "Composante principale 28 issue d'une analyse en composantes principales, anonymisee par la source.", "classification": "variable_pca", "stats": {"nuls": 0, "distincts": 275663, "min": -15.4300839055349, "max": 33.8478078188831}}, {"nom": "montant", "source": "Amount", "type": "decimal", "obligatoire": true, "unite": "euro", "description": "Montant de la transaction.", "classification": "financier", "regles": [{"id": "C03", "type": "minimum", "valeur": 0, "severite": "erreur"}, {"id": "C04", "type": "expression", "violation": "montant == 0", "severite": "avertissement", "message": "montant nul, conserve car 27 de ces transactions sont des fraudes"}], "stats": {"nuls": 0, "distincts": 32767, "min": 0.0, "max": 25691.16}}, {"nom": "classe", "source": "Class", "type": "entier", "obligatoire": true, "description": "Etiquette de fraude, verite terrain (1 fraude).", "classification": "cible", "usage": "cible d'apprentissage, jamais utilisee comme variable", "valeurs": [0, 1], "regles": [{"id": "C05", "type": "valeurs", "severite": "erreur"}], "stats": {"nuls": 0, "distincts": 2, "min": 0.0, "max": 1.0}}, {"nom": "controles_qualite", "type": "texte", "classification": "technique", "description": "Identifiants des regles d'avertissement declenchees, separes par des virgules.", "regles": [], "stats": {"nuls": 0, "distincts": 2}}], "rapport": {"contrat": "guardpay.transactions_cartes", "version_contrat": "1.0.0", "lignes_lues": 284807, "lignes_silver": 283726, "lignes_quarantaine": 1081, "taux_rejet": 0.00379555277784605, "seuil_rejet": 0.01, "conforme": true, "lignes_attendues": 284807, "volume_conforme": true, "fraudes_lues": 492, "fraudes_silver": 473, "duree_secondes": 2.4, "regles": [{"regle": "NUL_id_transaction", "severite": "erreur", "message": "id_transaction manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "C01", "severite": "erreur", "message": "id_transaction minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_temps", "severite": "erreur", "message": "temps manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "C02", "severite": "erreur", "message": "temps plage", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v1", "severite": "erreur", "message": "v1 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v2", "severite": "erreur", "message": "v2 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v3", "severite": "erreur", "message": "v3 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v4", "severite": "erreur", "message": "v4 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v5", "severite": "erreur", "message": "v5 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v6", "severite": "erreur", "message": "v6 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v7", "severite": "erreur", "message": "v7 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v8", "severite": "erreur", "message": "v8 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v9", "severite": "erreur", "message": "v9 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v10", "severite": "erreur", "message": "v10 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v11", "severite": "erreur", "message": "v11 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v12", "severite": "erreur", "message": "v12 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v13", "severite": "erreur", "message": "v13 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v14", "severite": "erreur", "message": "v14 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v15", "severite": "erreur", "message": "v15 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v16", "severite": "erreur", "message": "v16 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v17", "severite": "erreur", "message": "v17 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v18", "severite": "erreur", "message": "v18 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v19", "severite": "erreur", "message": "v19 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v20", "severite": "erreur", "message": "v20 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v21", "severite": "erreur", "message": "v21 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v22", "severite": "erreur", "message": "v22 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v23", "severite": "erreur", "message": "v23 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v24", "severite": "erreur", "message": "v24 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v25", "severite": "erreur", "message": "v25 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v26", "severite": "erreur", "message": "v26 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v27", "severite": "erreur", "message": "v27 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_v28", "severite": "erreur", "message": "v28 manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "NUL_montant", "severite": "erreur", "message": "montant manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "C03", "severite": "erreur", "message": "montant minimum", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "C04", "severite": "avertissement", "message": "montant nul, conserve car 27 de ces transactions sont des fraudes", "lignes": 1825, "dont_fraudes": 27, "taux": 0.006407848121710491}, {"regle": "NUL_classe", "severite": "erreur", "message": "classe manquant", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "C05", "severite": "erreur", "message": "classe valeurs", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}, {"regle": "C20", "severite": "erreur", "message": "transaction strictement identique a une autre, 1081 doublons dont 19 fraudes, ecartes pour eviter toute fuite entre apprentissage et test", "lignes": 1081, "dont_fraudes": 19, "taux": 0.00379555277784605}, {"regle": "C21", "severite": "erreur", "message": "unicite_id_transaction", "lignes": 0, "dont_fraudes": 0, "taux": 0.0}]}}], "depot": "https://github.com/ouassim16wass/projet_file_rouge"};
+
+const VUES = [["jeux", "Jeux de données"], ["dico", "Dictionnaire et contrats"], ["qualite", "Qualité"], ["test", "Tester une opération"]];
+const etat = { vue: "jeux", contrat: 0, classe: null, ouverts: new Set(), jeuxOuverts: new Set(), couche: null, statut: null, valeurs: {} };
+const el = (id) => document.getElementById(id);
+const C = () => DONNEES.contrats[etat.contrat];
+const fr = (n) => Number(n).toLocaleString("fr-FR");
+
+function creer(tag, classe, texte) {
+  const n = document.createElement(tag);
+  if (classe) n.className = classe;
+  if (texte !== undefined) n.textContent = texte;
+  return n;
+}
+
+function pill(classe, texte) { return creer("span", "pill " + classe, texte); }
+
+function classeStatut(s) { return s.startsWith("realise") ? "ok" : s === "prevu" ? "neutre" : "warn"; }
+
+function decrire(champ, regle) {
+  switch (regle.type) {
+    case "minimum": return "valeur au moins " + regle.valeur;
+    case "plage": return "entre " + regle.min + " et " + regle.max;
+    case "valeurs": return "valeur parmi " + champ.valeurs.join(", ");
+    case "format": return "format " + champ.format;
+    default: return regle.message || regle.violation;
+  }
+}
+
+function dessinerEntete() {
+  const j = DONNEES.jeux;
+  const realises = j.filter((x) => x.statut.startsWith("realise")).length;
+  const champs = DONNEES.contrats.reduce((s, c) => s + c.champs_catalogue.length, 0);
+  const regles = DONNEES.contrats.reduce((s, c) => s + c.champs.reduce((t, f) => t + (f.regles || []).length, 0) + (c.regles_table || []).length, 0);
+  const zone = el("stats");
+  zone.replaceChildren();
+  [[j.length, "jeux de données"], [realises, "réalisés"], [DONNEES.contrats.length, "contrats actifs"], [champs, "champs documentés"], [regles, "règles de qualité"]].forEach(([v, l]) => {
+    const s = creer("div", "stat");
+    s.append(creer("b", null, String(v)), creer("span", null, l));
+    zone.append(s);
+  });
+}
+
+function dessinerNav() {
+  const nav = el("nav");
+  nav.replaceChildren();
+  VUES.forEach(([id, nom]) => {
+    const b = creer("button", null, nom);
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(etat.vue === id));
+    b.addEventListener("click", () => aller(id));
+    nav.append(b);
+  });
+}
+
+function aller(vue) {
+  etat.vue = vue;
+  VUES.forEach(([id]) => { el("vue-" + id).hidden = id !== vue; });
+  dessinerNav();
+  if (vue === "dico") dessinerDico();
+  if (vue === "qualite") dessinerQualite();
+  if (vue === "test") dessinerTest();
+  history.replaceState(null, "", "#" + vue);
+}
+
+function amont(j) { return DONNEES.jeux.filter((x) => x.id !== j.id && new RegExp("\\b" + x.id + "\\b").test(String(j.source))); }
+function aval(j) { return DONNEES.jeux.filter((x) => x.id !== j.id && new RegExp("\\b" + j.id + "\\b").test(String(x.source))); }
+
+function puceChoix(zone, valeurs, courant, choisir) {
+  zone.replaceChildren();
+  valeurs.forEach((v) => {
+    const b = creer("button", "chip", v);
+    b.setAttribute("aria-pressed", String(courant === v));
+    b.addEventListener("click", () => choisir(courant === v ? null : v));
+    zone.append(b);
+  });
+}
+
+function dessinerJeux() {
+  puceChoix(el("chips-couche"), [...new Set(DONNEES.jeux.map((j) => j.couche))], etat.couche, (v) => { etat.couche = v; dessinerJeux(); });
+  puceChoix(el("chips-statut"), [...new Set(DONNEES.jeux.map((j) => j.statut))], etat.statut, (v) => { etat.statut = v; dessinerJeux(); });
+  const q = el("rech-jeux").value.trim().toLowerCase();
+  const corps = el("corps-jeux");
+  corps.replaceChildren();
+  let n = 0;
+  DONNEES.jeux.forEach((j) => {
+    const texte = Object.values(j).join(" ").toLowerCase();
+    if ((q && !texte.includes(q)) || (etat.couche && j.couche !== etat.couche) || (etat.statut && j.statut !== etat.statut)) return;
+    n += 1;
+    const tr = creer("tr", "ligne");
+    tr.id = "jeu-" + j.id;
+    tr.tabIndex = 0;
+    tr.setAttribute("aria-expanded", String(etat.jeuxOuverts.has(j.id)));
+    const id = creer("td"); id.append(creer("code", null, j.id));
+    const st = creer("td"); st.append(pill(classeStatut(j.statut), j.statut));
+    tr.append(id, creer("td", null, j.nom), creer("td", null, j.couche), st, creer("td", null, String(j.source)), creer("td", null, String(j.cle)), creer("td", null, j.sensibilite), creer("td", null, j.retention));
+    const basculer = () => { etat.jeuxOuverts.has(j.id) ? etat.jeuxOuverts.delete(j.id) : etat.jeuxOuverts.add(j.id); dessinerJeux(); };
+    tr.addEventListener("click", basculer);
+    tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); basculer(); } });
+    corps.append(tr);
+    if (!etat.jeuxOuverts.has(j.id)) return;
+    const d = creer("tr", "detail");
+    const td = creer("td"); td.colSpan = 8;
+    const corpsD = creer("div", "detail-body");
+    const a = creer("div"); a.append(creer("h3", null, "Description"), creer("p", null, j.description));
+    const kv = creer("dl", "kv");
+    [["Stockage", j.stockage], ["Fréquence", j.frequence], ["Propriétaire", j.proprietaire], ["Contrat", j.contrat]].forEach(([k, v]) => { kv.append(creer("dt", null, k), creer("dd", null, v)); });
+    const b = creer("div"); b.append(creer("h3", null, "Fiche"), kv);
+    const lien = creer("div"); lien.append(creer("h3", null, "Lignée"));
+    const liste = (titre, jeux) => {
+      const p = creer("p");
+      p.append(titre + " : ");
+      if (!jeux.length) p.append("aucun jeu du catalogue");
+      jeux.forEach((x, i) => {
+        const bt = creer("button", "lien", x.id + " " + x.nom);
+        bt.addEventListener("click", (e) => { e.stopPropagation(); etat.jeuxOuverts.add(x.id); dessinerJeux(); el("jeu-" + x.id)?.scrollIntoView({ block: "center" }); });
+        if (i) p.append(", ");
+        p.append(bt);
+      });
+      lien.append(p);
+    };
+    liste("Alimenté par", amont(j));
+    liste("Alimente", aval(j));
+    const idx = DONNEES.contrats.findIndex((c) => c.contrat.id === j.contrat);
+    if (idx >= 0) {
+      const bt = creer("button", "lien", "Voir le dictionnaire et le contrat");
+      bt.addEventListener("click", (e) => { e.stopPropagation(); etat.contrat = idx; aller("dico"); });
+      lien.append(bt);
+    }
+    corpsD.append(a, b, lien);
+    td.append(corpsD); d.append(td); corps.append(d);
+  });
+  el("compte-jeux").textContent = n + " jeu" + (n > 1 ? "x" : "") + " affiché" + (n > 1 ? "s" : "") + " sur " + DONNEES.jeux.length + ". Cliquez une ligne pour la fiche et la lignée.";
+}
+
+function dessinerSources() {
+  const zone = el("sources");
+  zone.replaceChildren();
+  DONNEES.sources.forEach((s) => {
+    const c = creer("div", "carte");
+    const t = creer("h3"); t.append(creer("code", null, s.id), " " + s.nom);
+    const a = creer("a", null, s.url); a.href = s.url; a.target = "_blank"; a.rel = "noopener"; a.className = "mono";
+    c.append(t, creer("p", null, s.nature + ", origine " + s.origine), creer("p", "note", "Licence : " + s.licence), a);
+    zone.append(c);
+  });
+}
+
+function dessinerOnglets(zoneId, apres) {
+  const zone = el(zoneId);
+  zone.replaceChildren();
+  DONNEES.contrats.forEach((c, i) => {
+    const b = creer("button", "tab");
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(i === etat.contrat));
+    b.append(c.contrat.jeu_de_donnees, creer("small", null, c.contrat.id + " v" + c.contrat.version));
+    b.addEventListener("click", () => { etat.contrat = i; etat.classe = null; etat.ouverts.clear(); apres(); });
+    zone.append(b);
+  });
+}
+
+function dessinerEngagements() {
+  const c = C(), m = c.contrat, q = c.qualite_globale;
+  el("desc-contrat").textContent = m.description;
+  const lignes = [
+    ["Propriétaire", m.proprietaire],
+    ["Consommateurs", m.consommateurs.join(", ")],
+    ["Source", m.source.nom + " (" + m.source.nature + ")"],
+    ["Licence", m.source.licence],
+    ["Livraison", m.fraicheur.livraison],
+    ["Volume attendu", fr(m.volumetrie.lignes_attendues) + " lignes"],
+    ["Rejet maximal", (q.taux_rejet_max * 100).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " %"],
+    ["Conservation", m.retention],
+    ["Évolution", m.evolution.compatibilite],
+    ["Notification", m.evolution.notification],
+  ];
+  if (m.fraicheur.delai_max_ingestion_secondes) lignes.splice(5, 0, ["Délai d'ingestion", m.fraicheur.delai_max_ingestion_secondes + " s au plus"]);
+  const dl = el("eng");
+  dl.replaceChildren();
+  lignes.forEach(([k, v]) => { const d = creer("div", "eng"); d.append(creer("dt", null, k), creer("dd", null, v)); dl.append(d); });
+  el("actions").textContent = "Erreur : " + q.actions.erreur + ". Avertissement : " + q.actions.avertissement + ".";
+}
+
+function dessinerChamps() {
+  const classes = [...new Set(C().champs_catalogue.map((f) => f.classification))];
+  puceChoix(el("chips"), classes, etat.classe, (v) => { etat.classe = v; dessinerChamps(); });
+  const q = el("recherche").value.trim().toLowerCase();
+  const corps = el("corps");
+  corps.replaceChildren();
+  let n = 0;
+  C().champs_catalogue.forEach((f) => {
+    const regles = f.regles || [];
+    const texte = [f.nom, f.source || "", f.description, f.classification, ...regles.map((r) => r.id + " " + decrire(f, r))].join(" ").toLowerCase();
+    if ((q && !texte.includes(q)) || (etat.classe && f.classification !== etat.classe)) return;
+    n += 1;
+    const tr = creer("tr", "ligne");
+    tr.tabIndex = 0;
+    tr.setAttribute("aria-expanded", String(etat.ouverts.has(f.nom)));
+    const nom = creer("td"); nom.append(creer("code", null, f.nom));
+    const src = creer("td"); src.append(creer("code", null, f.source || "calculé"));
+    const rc = creer("td");
+    regles.forEach((r) => { const p = pill(r.severite, r.id); p.title = r.severite + " : " + decrire(f, r); rc.append(p, " "); });
+    if (f.pseudonymise) rc.append(pill("neutre", "pseudonymisé"));
+    tr.append(nom, src, creer("td", null, f.type), creer("td", null, f.classification), rc);
+    const basculer = () => { etat.ouverts.has(f.nom) ? etat.ouverts.delete(f.nom) : etat.ouverts.add(f.nom); dessinerChamps(); };
+    tr.addEventListener("click", basculer);
+    tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); basculer(); } });
+    corps.append(tr);
+    if (!etat.ouverts.has(f.nom)) return;
+    const d = creer("tr", "detail");
+    const td = creer("td"); td.colSpan = 5;
+    const corpsD = creer("div", "detail-body");
+    const a = creer("div"); a.append(creer("h3", null, "Description"), creer("p", null, f.description));
+    if (f.usage) a.append(creer("p", "note", "Usage : " + f.usage));
+    if (f.unite) a.append(creer("p", "note", "Unité : " + f.unite));
+    const m = creer("div"); m.append(creer("h3", null, "Mesures sur le silver"));
+    const kv = creer("dl", "kv");
+    const st = f.stats || {};
+    if (st.min !== undefined) { kv.append(creer("dt", null, "Minimum"), creer("dd", null, fr(st.min))); kv.append(creer("dt", null, "Maximum"), creer("dd", null, fr(st.max))); }
+    kv.append(creer("dt", null, "Valeurs distinctes"), creer("dd", null, fr(st.distincts)), creer("dt", null, "Valeurs nulles"), creer("dd", null, fr(st.nuls)));
+    m.append(kv);
+    const b = creer("div"); b.append(creer("h3", null, "Règles"));
+    const ul = creer("ul", "rules");
+    const liste = (f.obligatoire ? [{ id: "NUL", severite: "erreur", texte: "valeur obligatoire" }] : []).concat(regles.map((r) => ({ id: r.id, severite: r.severite, texte: decrire(f, r) })));
+    if (f.unique) liste.push({ id: "UNIQUE", severite: "erreur", texte: "valeur unique sur le lot" });
+    if (!liste.length) ul.append(creer("li", "note", "Aucune règle propre à ce champ."));
+    liste.forEach((r) => { const li = creer("li"); li.append(creer("span", "id", r.id), pill(r.severite, r.severite), creer("span", null, r.texte)); ul.append(li); });
+    b.append(ul);
+    corpsD.append(a, m, b);
+    td.append(corpsD); d.append(td); corps.append(d);
+  });
+  el("compte").textContent = n + " champ" + (n > 1 ? "s" : "") + " affiché" + (n > 1 ? "s" : "") + " sur " + C().champs_catalogue.length + ". Cliquez une ligne pour le détail.";
+}
+
+function dessinerReglesTable() {
+  const ul = el("regles-table");
+  ul.replaceChildren();
+  (C().regles_table || []).forEach((r) => {
+    const li = creer("li");
+    li.append(creer("span", "id", r.id), pill(r.severite, r.severite), creer("span", null, r.message || r.nom));
+    ul.append(li);
+  });
+}
+
+function dessinerDico() {
+  dessinerOnglets("tabs", dessinerDico);
+  dessinerEngagements();
+  dessinerChamps();
+  dessinerReglesTable();
+  dessinerPied();
+}
+
+function dessinerQualite() {
+  const zone = el("qualite");
+  zone.replaceChildren(creer("h2", null, "Qualité mesurée"));
+  zone.append(creer("p", "note", "Dernière exécution du nettoyage sur le fichier complet, règles du contrat appliquées."));
+  DONNEES.contrats.forEach((c) => {
+    const r = c.rapport;
+    const bloc = creer("div");
+    bloc.style.display = "flex"; bloc.style.flexDirection = "column"; bloc.style.gap = "12px";
+    const t = creer("h3"); t.append(c.contrat.id + " ");
+    if (!r) { bloc.append(t, creer("p", "note", "Aucun rapport disponible.")); zone.append(bloc); return; }
+    t.append(pill(r.conforme ? "ok" : "err", r.conforme ? "conforme" : "non conforme"));
+    const k = creer("div", "kpis");
+    [["Lignes lues", fr(r.lignes_lues)], ["Conservées en silver", fr(r.lignes_silver)], ["En quarantaine", fr(r.lignes_quarantaine)], ["Taux de rejet", (r.taux_rejet * 100).toFixed(2).replace(".", ",") + " % (max " + (r.seuil_rejet * 100).toLocaleString("fr-FR") + " %)"], ["Fraudes lues / conservées", fr(r.fraudes_lues) + " / " + fr(r.fraudes_silver)]].forEach(([l, v]) => {
+      const x = creer("div", "kpi"); x.append(creer("b", null, v), creer("span", null, l)); k.append(x);
+    });
+    const tab = creer("table");
+    const th = creer("thead"); const trh = creer("tr");
+    ["Règle", "Sévérité", "Description", "Lignes", "Dont fraudes", "Part"].forEach((h, i) => { const c2 = creer("th", i >= 3 && i < 5 ? "num" : null, h); trh.append(c2); });
+    th.append(trh); tab.append(th);
+    const tb = creer("tbody");
+    r.regles.filter((x) => x.lignes > 0 || x.severite === "avertissement" || /^[RC]2/.test(x.regle)).sort((a, b) => a.regle.localeCompare(b.regle)).forEach((x) => {
+      const tr = creer("tr");
+      const sv = creer("td"); sv.append(pill(x.severite, x.severite));
+      const part = creer("td"); const bar = creer("div", "barre"); const i = creer("i", x.severite); i.style.width = Math.max(x.taux * 100, x.lignes ? 1.5 : 0) + "%"; bar.append(i); part.append(bar, creer("span", "note", (x.taux * 100).toFixed(x.taux < 0.01 ? 3 : 1).replace(".", ",") + " %"));
+      tr.append(creer("td", "mono", x.regle), sv, creer("td", null, x.message), creer("td", "num", fr(x.lignes)), creer("td", "num", fr(x.dont_fraudes)), part);
+      tb.append(tr);
+    });
+    tab.append(tb);
+    const sc = creer("div", "scroll"); sc.append(tab);
+    bloc.append(t, k, sc);
+    zone.append(bloc);
+  });
+  dessinerPied();
+}
+
+function versJs(expression) {
+  return expression.replace(/\band\b/g, "&&").replace(/\bor\b/g, "||").replace(/\bnot\b/g, "!").replace(/\babs\(/g, "Math.abs(");
+}
+
+function lire(champ, brut) {
+  if (champ.type === "texte") return brut;
+  if (brut === "" || brut === null || brut === undefined) return NaN;
+  return Number(brut);
+}
+
+function executer(expression, vars) {
+  try {
+    const noms = Object.keys(vars);
+    return Boolean(new Function(...noms, "return (" + versJs(expression) + ");")(...noms.map((n) => vars[n])));
+  } catch (e) {
+    return false;
+  }
+}
+
+function evaluer(valeurs) {
+  const c = C();
+  const touches = [];
+  const vars = {};
+  c.champs.forEach((f) => { if (f.source !== "genere") vars[f.nom] = lire(f, valeurs[f.nom]); });
+  c.champs.forEach((f) => {
+    if (f.source === "genere") return;
+    const v = vars[f.nom];
+    const vide = f.type === "texte" ? v === "" : Number.isNaN(v);
+    if (f.obligatoire && vide) { touches.push({ id: "NUL_" + f.nom, severite: "erreur", texte: f.nom + " manquant" }); return; }
+    (f.regles || []).forEach((r) => {
+      let viole = false;
+      if (r.type === "minimum") viole = v < r.valeur;
+      else if (r.type === "plage") viole = v < r.min || v > r.max;
+      else if (r.type === "valeurs") viole = !f.valeurs.map((x) => (f.type === "texte" ? String(x) : Number(x))).includes(v);
+      else if (r.type === "format") viole = !new RegExp(f.format).test(String(v));
+      else if (r.type === "expression") viole = executer(r.violation, vars);
+      if (viole) touches.push({ id: r.id, severite: r.severite, texte: r.message || (f.nom + " : " + decrire(f, r)) });
+    });
+  });
+  (c.regles_table || []).forEach((r) => {
+    if (r.type === "expression" && executer(r.violation, vars)) touches.push({ id: r.id, severite: r.severite, texte: r.message || r.nom });
+  });
+  return touches;
+}
+
+function dessinerVerdict() {
+  const touches = evaluer(etat.valeurs);
+  const erreurs = touches.filter((t) => t.severite === "erreur");
+  const avert = touches.filter((t) => t.severite === "avertissement");
+  const zone = el("verdict");
+  zone.className = "verdict " + (erreurs.length ? "err" : avert.length ? "warn" : "ok");
+  zone.replaceChildren();
+  zone.append(creer("h3", null, erreurs.length ? "Rejetée, envoyée en quarantaine" : avert.length ? "Conservée avec avertissement" : "Conservée, aucune anomalie"));
+  const ul = creer("ul", "rules");
+  touches.forEach((t) => { const li = creer("li"); li.append(creer("span", "id", t.id), pill(t.severite, t.severite), creer("span", null, t.texte)); ul.append(li); });
+  if (touches.length) zone.append(ul);
+  else zone.append(creer("p", "note", "Toutes les règles évaluables sur une ligne sont respectées."));
+  if (erreurs.length) zone.append(creer("p", "note", "La ligne est écartée avec la liste des règles violées et ne passe pas en silver."));
+}
+
+function dessinerTest() {
+  dessinerOnglets("tabs-test", dessinerTest);
+  const c = C();
+  const base = c.exemple.base;
+  etat.valeurs = { ...base };
+  const form = el("formulaire");
+  form.replaceChildren();
+  const extra = creer("details", "extra");
+  extra.append(creer("summary", null, "Composantes anonymisées"));
+  const formExtra = creer("div", "form");
+  extra.append(formExtra);
+  c.champs.forEach((f) => {
+    if (f.source === "genere") return;
+    const lab = creer("label");
+    lab.append(f.nom);
+    let champ;
+    if (f.valeurs && f.type === "texte") {
+      champ = creer("select");
+      f.valeurs.forEach((v) => champ.append(new Option(v, v)));
+    } else {
+      champ = creer("input");
+      champ.type = f.type === "texte" ? "text" : "number";
+      if (f.type !== "texte") champ.step = "any";
+    }
+    champ.id = "f-" + f.nom;
+    champ.value = base[f.nom];
+    champ.addEventListener("input", () => { etat.valeurs[f.nom] = champ.value; dessinerVerdict(); });
+    lab.append(champ);
+    (f.classification === "variable_pca" ? formExtra : form).append(lab);
+  });
+  if (formExtra.children.length) form.append(extra);
+  const zone = el("presets");
+  zone.replaceChildren();
+  c.exemple.cas.forEach((cas) => {
+    const b = creer("button", "chip", cas.nom);
+    b.addEventListener("click", () => {
+      etat.valeurs = { ...base, ...cas.valeurs };
+      Object.keys(etat.valeurs).forEach((k) => { const i = el("f-" + k); if (i) i.value = etat.valeurs[k]; });
+      dessinerVerdict();
+    });
+    zone.append(b);
+  });
+  dessinerVerdict();
+  dessinerPied();
+}
+
+function dessinerPied() {
+  const pied = el("pied");
+  pied.replaceChildren();
+  const a = creer("a", null, "Dépôt GitHub");
+  a.href = DONNEES.depot; a.target = "_blank"; a.rel = "noopener";
+  pied.append(a);
+  if (etat.vue === "dico" || etat.vue === "test") {
+    const f = creer("a", null, "Fichier du contrat : " + C().fichier);
+    f.href = DONNEES.depot + "/blob/main/" + C().fichier; f.target = "_blank"; f.rel = "noopener";
+    pied.append(f);
+  }
+  pied.append(creer("span", null, "Page générée par catalogue/generer_page_catalogue.py à partir des contrats, du catalogue et des rapports de qualité."));
+}
+
+el("rech-jeux").addEventListener("input", dessinerJeux);
+el("recherche").addEventListener("input", dessinerChamps);
+dessinerEntete();
+dessinerJeux();
+dessinerSources();
+const depart = location.hash.replace("#", "");
+aller(VUES.some(([id]) => id === depart) ? depart : "jeux");
+</script>
+
+</body>
+</html>

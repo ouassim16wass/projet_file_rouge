@@ -97,7 +97,7 @@ make pipeline
 make tests lint
 ```
 
-Les contrats font référence : [`contrats/operations.yaml`](contrats/operations.yaml) (PaySim) et [`contrats/creditcard.yaml`](contrats/creditcard.yaml) (ULB), présentés dans [`docs/contrats_donnees.md`](docs/contrats_donnees.md). Le nettoyage écarte les lignes invalides vers la quarantaine, signale les anomalies tolérées et pseudonymise les comptes (variable `PSEUDO_SEL` du fichier `.env`). `make pipeline` enchaîne nettoyage, transformation, chargement PostgreSQL et catalogue. Rapports : `docs/rapport_exploration.md`, `docs/rapport_qualite.md`, `docs/rapport_qualite_cartes.md`, `docs/catalogue_donnees.md`. Déploiement, CI/CD et coûts : `docs/deploiement.md`, `docs/gestion_couts.md`, `docs/mesures_couts.md`.
+Les contrats font référence : [`contrats/operations.yaml`](contrats/operations.yaml) (PaySim) et [`contrats/creditcard.yaml`](contrats/creditcard.yaml) (ULB), présentés dans [`docs/contrats_donnees.md`](docs/contrats_donnees.md). Le catalogue de données est aussi une page interactive : [`docs/catalogue.html`](docs/catalogue.html) (jeux, lignée, dictionnaire, qualité mesurée, testeur d'opération). Le nettoyage écarte les lignes invalides vers la quarantaine, signale les anomalies tolérées et pseudonymise les comptes (variable `PSEUDO_SEL` du fichier `.env`). `make pipeline` enchaîne nettoyage, transformation, chargement PostgreSQL et catalogue. Rapports : `docs/rapport_exploration.md`, `docs/rapport_qualite.md`, `docs/rapport_qualite_cartes.md`, `docs/catalogue_donnees.md`. Déploiement, CI/CD et coûts : `docs/deploiement.md`, `docs/gestion_couts.md`, `docs/mesures_couts.md`.
 
 ## Structure du dépôt
 
@@ -132,7 +132,7 @@ tests/
 | Arborescence, docker-compose (Kafka, PostgreSQL, MongoDB) | fait |
 | Rejeu des opérations vers Kafka (`ingestion/rejeu_kafka.py`) | fait, testé sur 3 pas |
 | Couche bronze Spark (`streaming/bronze.py`) | fait, testé : 4 274 lignes, 0 doublon |
-| Phase 1 : exploration, contrats de données (PaySim, ULB), nettoyage, quarantaine, catalogue, 27 tests | fait (voir `docs/plan_phases.md`) |
+| Phase 1 : exploration, contrats de données (PaySim, ULB), nettoyage, quarantaine, catalogue, 29 tests | fait (voir `docs/plan_phases.md`) |
 | Phase 1 : transformations, gold, chargement PostgreSQL idempotent | fait, 2 770 409 lignes |
 | Phase 1 : conteneur du pipeline, CI/CD, gestion des coûts | fait, workflows à valider sur GitHub |
 | Silver en streaming avec le même contrat | à faire |

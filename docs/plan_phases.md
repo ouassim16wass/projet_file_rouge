@@ -22,10 +22,12 @@ Phase en cours : 1.
 | 1.1 | Explorer PaySim (`exploration/profil_paysim.py`) | fait |
 | 1.2 | Contrat de donnees PaySim (`contrats/operations.yaml`) | fait |
 | 1.3 | Nettoyer, mettre en quarantaine, pseudonymiser (`qualite/nettoyer.py`) | fait |
-| 1.4 | Tester les contrats (`tests/`) | fait, 27 tests |
+| 1.4 | Tester les contrats (`tests/`) | fait, 29 tests |
 | 1.5 | Generer le catalogue (`catalogue/generer_catalogue.py`) | fait, PaySim et ULB |
 | 1.6 | Explorer et contractualiser ULB (`contrats/creditcard.yaml`) | fait, 1 081 doublons ecartes |
 | 1.7 | Transformer avant chargement (`transformation/variables.py`) : variables du modele, indicateurs horaires | fait |
 | 1.8 | Charger dans PostgreSQL de facon idempotente (`chargement/charger_postgres.py`, `warehouse/sql`) | fait |
-| 1.9 | Conteneuriser, CI/CD, gestion des couts (`infra/`, `.github/workflows`, `docs/deploiement.md`, `docs/gestion_couts.md`) | fait, workflows non executes sur GitHub |
-| 1.10 | Mettre a jour le PDF de cadrage avec les constats | a faire |
+| 1.9 | Conteneuriser, CI/CD, gestion des couts (`infra/`, `.github/workflows`, `docs/deploiement.md`, `docs/gestion_couts.md`) | fait |
+| 1.10 | Catalogue de donnees en page HTML interactive (`docs/catalogue.html`) | fait |
+| 1.11 | CI decoupee en 8 jobs, CD en 5 jobs, controle des donnees a la demande | fait |
+| 1.12 | Mettre a jour le PDF de cadrage avec les constats | a faire |

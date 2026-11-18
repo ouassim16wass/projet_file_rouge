@@ -1,0 +1,660 @@
+<title>Catalogue de données GuardPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-2: #f5f7f9;
+  --fg: #16212b;
+  --muted: #5b6875;
+  --line: #d5dbe1;
+  --accent: #0b6e6e;
+  --accent-soft: #d8eeee;
+  --ok: #1d7a46;
+  --ok-soft: #dcf1e4;
+  --warn: #8a5a00;
+  --warn-soft: #fbecc8;
+  --err: #a8261d;
+  --err-soft: #f9dcd9;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-head: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1519;
+    --surface: #172026;
+    --surface-2: #1d2830;
+    --fg: #e6ecf0;
+    --muted: #94a3af;
+    --line: #2a3640;
+    --accent: #4cc2c2;
+    --accent-soft: #14383a;
+    --ok: #5cc98a;
+    --ok-soft: #12301f;
+    --warn: #e5b04a;
+    --warn-soft: #382b0c;
+    --err: #ff8a80;
+    --err-soft: #3d1a17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1519;
+  --surface: #172026;
+  --surface-2: #1d2830;
+  --fg: #e6ecf0;
+  --muted: #94a3af;
+  --line: #2a3640;
+  --accent: #4cc2c2;
+  --accent-soft: #14383a;
+  --ok: #5cc98a;
+  --ok-soft: #12301f;
+  --warn: #e5b04a;
+  --warn-soft: #382b0c;
+  --err: #ff8a80;
+  --err-soft: #3d1a17;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--font-head); font-weight: 600; margin: 0; text-wrap: balance; }
+h1 { font-size: 32px; line-height: 1.15; }
+h2 { font-size: 20px; }
+h3 { font-size: 16px; }
+p { margin: 0; }
+code, .mono { font-family: var(--font-mono); font-size: 0.92em; }
+a { color: var(--accent); }
+.head p { color: var(--muted); max-width: 66ch; margin-top: 6px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 14px; }
+.stat b { font-family: var(--font-head); font-size: 24px; display: block; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 13px; }
+.nav { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); }
+.nav button {
+  font: inherit; cursor: pointer; padding: 10px 16px; background: none; color: var(--muted);
+  border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.nav button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab {
+  font: inherit; cursor: pointer; padding: 9px 14px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); border-radius: 6px; text-align: left;
+}
+.tab small { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+.tab[aria-selected="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.grid-eng { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin: 0; }
+.eng { background: var(--surface); padding: 12px 14px; min-width: 0; }
+.eng dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.eng dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.toolbar input[type="search"] {
+  font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface-2); color: var(--fg); min-width: 0; flex: 1 1 220px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: inherit; font-size: 13px; cursor: pointer; padding: 4px 10px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--fg); border-radius: 999px;
+}
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 680px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--surface-2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.ligne { cursor: pointer; }
+tr.ligne:hover td { background: var(--surface-2); }
+tr.detail td { background: var(--surface-2); }
+.detail-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.detail-body h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 3px 12px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.pill { display: inline-block; font-size: 12px; font-family: var(--font-mono); padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.erreur, .pill.err { background: var(--err-soft); color: var(--err); }
+.pill.avertissement, .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.neutre { background: var(--accent-soft); color: var(--accent); }
+.lien { font: inherit; background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rules li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.rules .id { font-family: var(--font-mono); font-weight: 500; min-width: 3.2em; }
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.carte { border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.kpi { background: var(--surface-2); border-radius: 6px; padding: 10px 12px; }
+.kpi b { font-family: var(--font-head); font-size: 20px; display: block; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.kpi span { color: var(--muted); font-size: 12px; }
+.barre { height: 8px; background: var(--surface-2); border-radius: 4px; min-width: 80px; overflow: hidden; }
+.barre i { display: block; height: 100%; background: var(--warn); }
+.barre i.erreur { background: var(--err); }
+.playground { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 760px) { .playground { grid-template-columns: minmax(0, 1fr); } }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); min-width: 0; }
+.form input, .form select {
+  font-family: var(--font-mono); font-size: 14px; padding: 7px 9px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--surface-2); color: var(--fg); min-width: 0; width: 100%;
+}
+details.extra { grid-column: 1 / -1; }
+details.extra summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+details.extra .form { margin-top: 10px; }
+.verdict { border-radius: 8px; padding: 16px; border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; align-self: start; position: sticky; top: 12px; }
+.verdict.ok { background: var(--ok-soft); border-color: var(--ok); }
+.verdict.warn { background: var(--warn-soft); border-color: var(--warn); }
+.verdict.err { background: var(--err-soft); border-color: var(--err); }
+.verdict h3 { font-size: 20px; }
+.verdict.ok h3 { color: var(--ok); }
+.verdict.warn h3 { color: var(--warn); }
+.verdict.err h3 { color: var(--err); }
+.note { color: var(--muted); font-size: 13px; }
+.foot { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+@media (prefers-reduced-motion: no-preference) { .tab, .chip, .nav button { transition: background 0.12s, border-color 0.12s, color 0.12s; } }
+</style>
+
+<div class="page">
+  <header class="head">
+    <h1>Catalogue de données GuardPay</h1>
+    <p>Inventaire des jeux de données de la plateforme de détection de fraude de la Banque Aurore : où ils vivent, d'où ils viennent, ce qu'ils contiennent, quel contrat les encadre et quelle est leur qualité mesurée.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <nav class="nav" role="tablist" id="nav" aria-label="Sections du catalogue"></nav>
+
+  <section id="vue-jeux" class="panel-vue">
+    <div class="panel">
+      <h2>Jeux de données</h2>
+      <div class="toolbar">
+        <input type="search" id="rech-jeux" placeholder="Rechercher un jeu, une couche, un stockage" aria-label="Rechercher un jeu de données">
+        <div class="chips" id="chips-couche" role="group" aria-label="Filtrer par couche"></div>
+        <div class="chips" id="chips-statut" role="group" aria-label="Filtrer par statut"></div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>ID</th><th>Jeu</th><th>Couche</th><th>Statut</th><th>Source</th><th>Clé</th><th>Sensibilité</th><th>Rétention</th></tr></thead>
+          <tbody id="corps-jeux"></tbody>
+        </table>
+      </div>
+      <p class="note" id="compte-jeux"></p>
+    </div>
+    <div class="panel" style="margin-top: 22px">
+      <h2>Sources externes</h2>
+      <div class="cartes" id="sources"></div>
+    </div>
+  </section>
+
+  <section id="vue-dico" class="panel-vue" hidden>
+    <div class="panel">
+      <h2>Dictionnaire et contrat</h2>
+      <div class="tabs" id="tabs" role="tablist" aria-label="Contrats"></div>
+      <p id="desc-contrat"></p>
+      <dl class="grid-eng" id="eng"></dl>
+      <p class="note" id="actions"></p>
+      <div class="toolbar">
+        <input type="search" id="recherche" placeholder="Rechercher un champ, une règle, un mot" aria-label="Rechercher dans les champs">
+        <div class="chips" id="chips" role="group" aria-label="Filtrer par classification"></div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Champ</th><th>Source</th><th>Type</th><th>Classification</th><th>Règles</th></tr></thead>
+          <tbody id="corps"></tbody>
+        </table>
+      </div>
+      <p class="note" id="compte"></p>
+      <h3>Règles portant sur la table</h3>
+      <ul class="rules" id="regles-table"></ul>
+    </div>
+  </section>
+
+  <section id="vue-qualite" class="panel-vue" hidden>
+    <div class="panel" id="qualite"></div>
+  </section>
+
+  <section id="vue-test" class="panel-vue" hidden>
+    <div class="panel">
+      <h2>Tester une opération contre le contrat</h2>
+      <div class="tabs" id="tabs-test" role="tablist" aria-label="Contrat testé"></div>
+      <p class="note">Les valeurs saisies sont évaluées avec les mêmes règles que le nettoyage. Les règles d'unicité portent sur tout le lot et ne se testent pas sur une seule ligne.</p>
+      <div class="presets" id="presets" role="group" aria-label="Exemples"></div>
+      <div class="playground">
+        <div class="form" id="formulaire"></div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot" id="pied"></footer>
+</div>
+
+<script>
+const DONNEES = __DONNEES__;
+
+const VUES = [["jeux", "Jeux de données"], ["dico", "Dictionnaire et contrats"], ["qualite", "Qualité"], ["test", "Tester une opération"]];
+const etat = { vue: "jeux", contrat: 0, classe: null, ouverts: new Set(), jeuxOuverts: new Set(), couche: null, statut: null, valeurs: {} };
+const el = (id) => document.getElementById(id);
+const C = () => DONNEES.contrats[etat.contrat];
+const fr = (n) => Number(n).toLocaleString("fr-FR");
+
+function creer(tag, classe, texte) {
+  const n = document.createElement(tag);
+  if (classe) n.className = classe;
+  if (texte !== undefined) n.textContent = texte;
+  return n;
+}
+
+function pill(classe, texte) { return creer("span", "pill " + classe, texte); }
+
+function classeStatut(s) { return s.startsWith("realise") ? "ok" : s === "prevu" ? "neutre" : "warn"; }
+
+function decrire(champ, regle) {
+  switch (regle.type) {
+    case "minimum": return "valeur au moins " + regle.valeur;
+    case "plage": return "entre " + regle.min + " et " + regle.max;
+    case "valeurs": return "valeur parmi " + champ.valeurs.join(", ");
+    case "format": return "format " + champ.format;
+    default: return regle.message || regle.violation;
+  }
+}
+
+function dessinerEntete() {
+  const j = DONNEES.jeux;
+  const realises = j.filter((x) => x.statut.startsWith("realise")).length;
+  const champs = DONNEES.contrats.reduce((s, c) => s + c.champs_catalogue.length, 0);
+  const regles = DONNEES.contrats.reduce((s, c) => s + c.champs.reduce((t, f) => t + (f.regles || []).length, 0) + (c.regles_table || []).length, 0);
+  const zone = el("stats");
+  zone.replaceChildren();
+  [[j.length, "jeux de données"], [realises, "réalisés"], [DONNEES.contrats.length, "contrats actifs"], [champs, "champs documentés"], [regles, "règles de qualité"]].forEach(([v, l]) => {
+    const s = creer("div", "stat");
+    s.append(creer("b", null, String(v)), creer("span", null, l));
+    zone.append(s);
+  });
+}
+
+function dessinerNav() {
+  const nav = el("nav");
+  nav.replaceChildren();
+  VUES.forEach(([id, nom]) => {
+    const b = creer("button", null, nom);
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(etat.vue === id));
+    b.addEventListener("click", () => aller(id));
+    nav.append(b);
+  });
+}
+
+function aller(vue) {
+  etat.vue = vue;
+  VUES.forEach(([id]) => { el("vue-" + id).hidden = id !== vue; });
+  dessinerNav();
+  if (vue === "dico") dessinerDico();
+  if (vue === "qualite") dessinerQualite();
+  if (vue === "test") dessinerTest();
+  history.replaceState(null, "", "#" + vue);
+}
+
+function amont(j) { return DONNEES.jeux.filter((x) => x.id !== j.id && new RegExp("\\b" + x.id + "\\b").test(String(j.source))); }
+function aval(j) { return DONNEES.jeux.filter((x) => x.id !== j.id && new RegExp("\\b" + j.id + "\\b").test(String(x.source))); }
+
+function puceChoix(zone, valeurs, courant, choisir) {
+  zone.replaceChildren();
+  valeurs.forEach((v) => {
+    const b = creer("button", "chip", v);
+    b.setAttribute("aria-pressed", String(courant === v));
+    b.addEventListener("click", () => choisir(courant === v ? null : v));
+    zone.append(b);
+  });
+}
+
+function dessinerJeux() {
+  puceChoix(el("chips-couche"), [...new Set(DONNEES.jeux.map((j) => j.couche))], etat.couche, (v) => { etat.couche = v; dessinerJeux(); });
+  puceChoix(el("chips-statut"), [...new Set(DONNEES.jeux.map((j) => j.statut))], etat.statut, (v) => { etat.statut = v; dessinerJeux(); });
+  const q = el("rech-jeux").value.trim().toLowerCase();
+  const corps = el("corps-jeux");
+  corps.replaceChildren();
+  let n = 0;
+  DONNEES.jeux.forEach((j) => {
+    const texte = Object.values(j).join(" ").toLowerCase();
+    if ((q && !texte.includes(q)) || (etat.couche && j.couche !== etat.couche) || (etat.statut && j.statut !== etat.statut)) return;
+    n += 1;
+    const tr = creer("tr", "ligne");
+    tr.id = "jeu-" + j.id;
+    tr.tabIndex = 0;
+    tr.setAttribute("aria-expanded", String(etat.jeuxOuverts.has(j.id)));
+    const id = creer("td"); id.append(creer("code", null, j.id));
+    const st = creer("td"); st.append(pill(classeStatut(j.statut), j.statut));
+    tr.append(id, creer("td", null, j.nom), creer("td", null, j.couche), st, creer("td", null, String(j.source)), creer("td", null, String(j.cle)), creer("td", null, j.sensibilite), creer("td", null, j.retention));
+    const basculer = () => { etat.jeuxOuverts.has(j.id) ? etat.jeuxOuverts.delete(j.id) : etat.jeuxOuverts.add(j.id); dessinerJeux(); };
+    tr.addEventListener("click", basculer);
+    tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); basculer(); } });
+    corps.append(tr);
+    if (!etat.jeuxOuverts.has(j.id)) return;
+    const d = creer("tr", "detail");
+    const td = creer("td"); td.colSpan = 8;
+    const corpsD = creer("div", "detail-body");
+    const a = creer("div"); a.append(creer("h3", null, "Description"), creer("p", null, j.description));
+    const kv = creer("dl", "kv");
+    [["Stockage", j.stockage], ["Fréquence", j.frequence], ["Propriétaire", j.proprietaire], ["Contrat", j.contrat]].forEach(([k, v]) => { kv.append(creer("dt", null, k), creer("dd", null, v)); });
+    const b = creer("div"); b.append(creer("h3", null, "Fiche"), kv);
+    const lien = creer("div"); lien.append(creer("h3", null, "Lignée"));
+    const liste = (titre, jeux) => {
+      const p = creer("p");
+      p.append(titre + " : ");
+      if (!jeux.length) p.append("aucun jeu du catalogue");
+      jeux.forEach((x, i) => {
+        const bt = creer("button", "lien", x.id + " " + x.nom);
+        bt.addEventListener("click", (e) => { e.stopPropagation(); etat.jeuxOuverts.add(x.id); dessinerJeux(); el("jeu-" + x.id)?.scrollIntoView({ block: "center" }); });
+        if (i) p.append(", ");
+        p.append(bt);
+      });
+      lien.append(p);
+    };
+    liste("Alimenté par", amont(j));
+    liste("Alimente", aval(j));
+    const idx = DONNEES.contrats.findIndex((c) => c.contrat.id === j.contrat);
+    if (idx >= 0) {
+      const bt = creer("button", "lien", "Voir le dictionnaire et le contrat");
+      bt.addEventListener("click", (e) => { e.stopPropagation(); etat.contrat = idx; aller("dico"); });
+      lien.append(bt);
+    }
+    corpsD.append(a, b, lien);
+    td.append(corpsD); d.append(td); corps.append(d);
+  });
+  el("compte-jeux").textContent = n + " jeu" + (n > 1 ? "x" : "") + " affiché" + (n > 1 ? "s" : "") + " sur " + DONNEES.jeux.length + ". Cliquez une ligne pour la fiche et la lignée.";
+}
+
+function dessinerSources() {
+  const zone = el("sources");
+  zone.replaceChildren();
+  DONNEES.sources.forEach((s) => {
+    const c = creer("div", "carte");
+    const t = creer("h3"); t.append(creer("code", null, s.id), " " + s.nom);
+    const a = creer("a", null, s.url); a.href = s.url; a.target = "_blank"; a.rel = "noopener"; a.className = "mono";
+    c.append(t, creer("p", null, s.nature + ", origine " + s.origine), creer("p", "note", "Licence : " + s.licence), a);
+    zone.append(c);
+  });
+}
+
+function dessinerOnglets(zoneId, apres) {
+  const zone = el(zoneId);
+  zone.replaceChildren();
+  DONNEES.contrats.forEach((c, i) => {
+    const b = creer("button", "tab");
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(i === etat.contrat));
+    b.append(c.contrat.jeu_de_donnees, creer("small", null, c.contrat.id + " v" + c.contrat.version));
+    b.addEventListener("click", () => { etat.contrat = i; etat.classe = null; etat.ouverts.clear(); apres(); });
+    zone.append(b);
+  });
+}
+
+function dessinerEngagements() {
+  const c = C(), m = c.contrat, q = c.qualite_globale;
+  el("desc-contrat").textContent = m.description;
+  const lignes = [
+    ["Propriétaire", m.proprietaire],
+    ["Consommateurs", m.consommateurs.join(", ")],
+    ["Source", m.source.nom + " (" + m.source.nature + ")"],
+    ["Licence", m.source.licence],
+    ["Livraison", m.fraicheur.livraison],
+    ["Volume attendu", fr(m.volumetrie.lignes_attendues) + " lignes"],
+    ["Rejet maximal", (q.taux_rejet_max * 100).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " %"],
+    ["Conservation", m.retention],
+    ["Évolution", m.evolution.compatibilite],
+    ["Notification", m.evolution.notification],
+  ];
+  if (m.fraicheur.delai_max_ingestion_secondes) lignes.splice(5, 0, ["Délai d'ingestion", m.fraicheur.delai_max_ingestion_secondes + " s au plus"]);
+  const dl = el("eng");
+  dl.replaceChildren();
+  lignes.forEach(([k, v]) => { const d = creer("div", "eng"); d.append(creer("dt", null, k), creer("dd", null, v)); dl.append(d); });
+  el("actions").textContent = "Erreur : " + q.actions.erreur + ". Avertissement : " + q.actions.avertissement + ".";
+}
+
+function dessinerChamps() {
+  const classes = [...new Set(C().champs_catalogue.map((f) => f.classification))];
+  puceChoix(el("chips"), classes, etat.classe, (v) => { etat.classe = v; dessinerChamps(); });
+  const q = el("recherche").value.trim().toLowerCase();
+  const corps = el("corps");
+  corps.replaceChildren();
+  let n = 0;
+  C().champs_catalogue.forEach((f) => {
+    const regles = f.regles || [];
+    const texte = [f.nom, f.source || "", f.description, f.classification, ...regles.map((r) => r.id + " " + decrire(f, r))].join(" ").toLowerCase();
+    if ((q && !texte.includes(q)) || (etat.classe && f.classification !== etat.classe)) return;
+    n += 1;
+    const tr = creer("tr", "ligne");
+    tr.tabIndex = 0;
+    tr.setAttribute("aria-expanded", String(etat.ouverts.has(f.nom)));
+    const nom = creer("td"); nom.append(creer("code", null, f.nom));
+    const src = creer("td"); src.append(creer("code", null, f.source || "calculé"));
+    const rc = creer("td");
+    regles.forEach((r) => { const p = pill(r.severite, r.id); p.title = r.severite + " : " + decrire(f, r); rc.append(p, " "); });
+    if (f.pseudonymise) rc.append(pill("neutre", "pseudonymisé"));
+    tr.append(nom, src, creer("td", null, f.type), creer("td", null, f.classification), rc);
+    const basculer = () => { etat.ouverts.has(f.nom) ? etat.ouverts.delete(f.nom) : etat.ouverts.add(f.nom); dessinerChamps(); };
+    tr.addEventListener("click", basculer);
+    tr.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); basculer(); } });
+    corps.append(tr);
+    if (!etat.ouverts.has(f.nom)) return;
+    const d = creer("tr", "detail");
+    const td = creer("td"); td.colSpan = 5;
+    const corpsD = creer("div", "detail-body");
+    const a = creer("div"); a.append(creer("h3", null, "Description"), creer("p", null, f.description));
+    if (f.usage) a.append(creer("p", "note", "Usage : " + f.usage));
+    if (f.unite) a.append(creer("p", "note", "Unité : " + f.unite));
+    const m = creer("div"); m.append(creer("h3", null, "Mesures sur le silver"));
+    const kv = creer("dl", "kv");
+    const st = f.stats || {};
+    if (st.min !== undefined) { kv.append(creer("dt", null, "Minimum"), creer("dd", null, fr(st.min))); kv.append(creer("dt", null, "Maximum"), creer("dd", null, fr(st.max))); }
+    kv.append(creer("dt", null, "Valeurs distinctes"), creer("dd", null, fr(st.distincts)), creer("dt", null, "Valeurs nulles"), creer("dd", null, fr(st.nuls)));
+    m.append(kv);
+    const b = creer("div"); b.append(creer("h3", null, "Règles"));
+    const ul = creer("ul", "rules");
+    const liste = (f.obligatoire ? [{ id: "NUL", severite: "erreur", texte: "valeur obligatoire" }] : []).concat(regles.map((r) => ({ id: r.id, severite: r.severite, texte: decrire(f, r) })));
+    if (f.unique) liste.push({ id: "UNIQUE", severite: "erreur", texte: "valeur unique sur le lot" });
+    if (!liste.length) ul.append(creer("li", "note", "Aucune règle propre à ce champ."));
+    liste.forEach((r) => { const li = creer("li"); li.append(creer("span", "id", r.id), pill(r.severite, r.severite), creer("span", null, r.texte)); ul.append(li); });
+    b.append(ul);
+    corpsD.append(a, m, b);
+    td.append(corpsD); d.append(td); corps.append(d);
+  });
+  el("compte").textContent = n + " champ" + (n > 1 ? "s" : "") + " affiché" + (n > 1 ? "s" : "") + " sur " + C().champs_catalogue.length + ". Cliquez une ligne pour le détail.";
+}
+
+function dessinerReglesTable() {
+  const ul = el("regles-table");
+  ul.replaceChildren();
+  (C().regles_table || []).forEach((r) => {
+    const li = creer("li");
+    li.append(creer("span", "id", r.id), pill(r.severite, r.severite), creer("span", null, r.message || r.nom));
+    ul.append(li);
+  });
+}
+
+function dessinerDico() {
+  dessinerOnglets("tabs", dessinerDico);
+  dessinerEngagements();
+  dessinerChamps();
+  dessinerReglesTable();
+  dessinerPied();
+}
+
+function dessinerQualite() {
+  const zone = el("qualite");
+  zone.replaceChildren(creer("h2", null, "Qualité mesurée"));
+  zone.append(creer("p", "note", "Dernière exécution du nettoyage sur le fichier complet, règles du contrat appliquées."));
+  DONNEES.contrats.forEach((c) => {
+    const r = c.rapport;
+    const bloc = creer("div");
+    bloc.style.display = "flex"; bloc.style.flexDirection = "column"; bloc.style.gap = "12px";
+    const t = creer("h3"); t.append(c.contrat.id + " ");
+    if (!r) { bloc.append(t, creer("p", "note", "Aucun rapport disponible.")); zone.append(bloc); return; }
+    t.append(pill(r.conforme ? "ok" : "err", r.conforme ? "conforme" : "non conforme"));
+    const k = creer("div", "kpis");
+    [["Lignes lues", fr(r.lignes_lues)], ["Conservées en silver", fr(r.lignes_silver)], ["En quarantaine", fr(r.lignes_quarantaine)], ["Taux de rejet", (r.taux_rejet * 100).toFixed(2).replace(".", ",") + " % (max " + (r.seuil_rejet * 100).toLocaleString("fr-FR") + " %)"], ["Fraudes lues / conservées", fr(r.fraudes_lues) + " / " + fr(r.fraudes_silver)]].forEach(([l, v]) => {
+      const x = creer("div", "kpi"); x.append(creer("b", null, v), creer("span", null, l)); k.append(x);
+    });
+    const tab = creer("table");
+    const th = creer("thead"); const trh = creer("tr");
+    ["Règle", "Sévérité", "Description", "Lignes", "Dont fraudes", "Part"].forEach((h, i) => { const c2 = creer("th", i >= 3 && i < 5 ? "num" : null, h); trh.append(c2); });
+    th.append(trh); tab.append(th);
+    const tb = creer("tbody");
+    r.regles.filter((x) => x.lignes > 0 || x.severite === "avertissement" || /^[RC]2/.test(x.regle)).sort((a, b) => a.regle.localeCompare(b.regle)).forEach((x) => {
+      const tr = creer("tr");
+      const sv = creer("td"); sv.append(pill(x.severite, x.severite));
+      const part = creer("td"); const bar = creer("div", "barre"); const i = creer("i", x.severite); i.style.width = Math.max(x.taux * 100, x.lignes ? 1.5 : 0) + "%"; bar.append(i); part.append(bar, creer("span", "note", (x.taux * 100).toFixed(x.taux < 0.01 ? 3 : 1).replace(".", ",") + " %"));
+      tr.append(creer("td", "mono", x.regle), sv, creer("td", null, x.message), creer("td", "num", fr(x.lignes)), creer("td", "num", fr(x.dont_fraudes)), part);
+      tb.append(tr);
+    });
+    tab.append(tb);
+    const sc = creer("div", "scroll"); sc.append(tab);
+    bloc.append(t, k, sc);
+    zone.append(bloc);
+  });
+  dessinerPied();
+}
+
+function versJs(expression) {
+  return expression.replace(/\band\b/g, "&&").replace(/\bor\b/g, "||").replace(/\bnot\b/g, "!").replace(/\babs\(/g, "Math.abs(");
+}
+
+function lire(champ, brut) {
+  if (champ.type === "texte") return brut;
+  if (brut === "" || brut === null || brut === undefined) return NaN;
+  return Number(brut);
+}
+
+function executer(expression, vars) {
+  try {
+    const noms = Object.keys(vars);
+    return Boolean(new Function(...noms, "return (" + versJs(expression) + ");")(...noms.map((n) => vars[n])));
+  } catch (e) {
+    return false;
+  }
+}
+
+function evaluer(valeurs) {
+  const c = C();
+  const touches = [];
+  const vars = {};
+  c.champs.forEach((f) => { if (f.source !== "genere") vars[f.nom] = lire(f, valeurs[f.nom]); });
+  c.champs.forEach((f) => {
+    if (f.source === "genere") return;
+    const v = vars[f.nom];
+    const vide = f.type === "texte" ? v === "" : Number.isNaN(v);
+    if (f.obligatoire && vide) { touches.push({ id: "NUL_" + f.nom, severite: "erreur", texte: f.nom + " manquant" }); return; }
+    (f.regles || []).forEach((r) => {
+      let viole = false;
+      if (r.type === "minimum") viole = v < r.valeur;
+      else if (r.type === "plage") viole = v < r.min || v > r.max;
+      else if (r.type === "valeurs") viole = !f.valeurs.map((x) => (f.type === "texte" ? String(x) : Number(x))).includes(v);
+      else if (r.type === "format") viole = !new RegExp(f.format).test(String(v));
+      else if (r.type === "expression") viole = executer(r.violation, vars);
+      if (viole) touches.push({ id: r.id, severite: r.severite, texte: r.message || (f.nom + " : " + decrire(f, r)) });
+    });
+  });
+  (c.regles_table || []).forEach((r) => {
+    if (r.type === "expression" && executer(r.violation, vars)) touches.push({ id: r.id, severite: r.severite, texte: r.message || r.nom });
+  });
+  return touches;
+}
+
+function dessinerVerdict() {
+  const touches = evaluer(etat.valeurs);
+  const erreurs = touches.filter((t) => t.severite === "erreur");
+  const avert = touches.filter((t) => t.severite === "avertissement");
+  const zone = el("verdict");
+  zone.className = "verdict " + (erreurs.length ? "err" : avert.length ? "warn" : "ok");
+  zone.replaceChildren();
+  zone.append(creer("h3", null, erreurs.length ? "Rejetée, envoyée en quarantaine" : avert.length ? "Conservée avec avertissement" : "Conservée, aucune anomalie"));
+  const ul = creer("ul", "rules");
+  touches.forEach((t) => { const li = creer("li"); li.append(creer("span", "id", t.id), pill(t.severite, t.severite), creer("span", null, t.texte)); ul.append(li); });
+  if (touches.length) zone.append(ul);
+  else zone.append(creer("p", "note", "Toutes les règles évaluables sur une ligne sont respectées."));
+  if (erreurs.length) zone.append(creer("p", "note", "La ligne est écartée avec la liste des règles violées et ne passe pas en silver."));
+}
+
+function dessinerTest() {
+  dessinerOnglets("tabs-test", dessinerTest);
+  const c = C();
+  const base = c.exemple.base;
+  etat.valeurs = { ...base };
+  const form = el("formulaire");
+  form.replaceChildren();
+  const extra = creer("details", "extra");
+  extra.append(creer("summary", null, "Composantes anonymisées"));
+  const formExtra = creer("div", "form");
+  extra.append(formExtra);
+  c.champs.forEach((f) => {
+    if (f.source === "genere") return;
+    const lab = creer("label");
+    lab.append(f.nom);
+    let champ;
+    if (f.valeurs && f.type === "texte") {
+      champ = creer("select");
+      f.valeurs.forEach((v) => champ.append(new Option(v, v)));
+    } else {
+      champ = creer("input");
+      champ.type = f.type === "texte" ? "text" : "number";
+      if (f.type !== "texte") champ.step = "any";
+    }
+    champ.id = "f-" + f.nom;
+    champ.value = base[f.nom];
+    champ.addEventListener("input", () => { etat.valeurs[f.nom] = champ.value; dessinerVerdict(); });
+    lab.append(champ);
+    (f.classification === "variable_pca" ? formExtra : form).append(lab);
+  });
+  if (formExtra.children.length) form.append(extra);
+  const zone = el("presets");
+  zone.replaceChildren();
+  c.exemple.cas.forEach((cas) => {
+    const b = creer("button", "chip", cas.nom);
+    b.addEventListener("click", () => {
+      etat.valeurs = { ...base, ...cas.valeurs };
+      Object.keys(etat.valeurs).forEach((k) => { const i = el("f-" + k); if (i) i.value = etat.valeurs[k]; });
+      dessinerVerdict();
+    });
+    zone.append(b);
+  });
+  dessinerVerdict();
+  dessinerPied();
+}
+
+function dessinerPied() {
+  const pied = el("pied");
+  pied.replaceChildren();
+  const a = creer("a", null, "Dépôt GitHub");
+  a.href = DONNEES.depot; a.target = "_blank"; a.rel = "noopener";
+  pied.append(a);
+  if (etat.vue === "dico" || etat.vue === "test") {
+    const f = creer("a", null, "Fichier du contrat : " + C().fichier);
+    f.href = DONNEES.depot + "/blob/main/" + C().fichier; f.target = "_blank"; f.rel = "noopener";
+    pied.append(f);
+  }
+  pied.append(creer("span", null, "Page générée par catalogue/generer_page_catalogue.py à partir des contrats, du catalogue et des rapports de qualité."));
+}
+
+el("rech-jeux").addEventListener("input", dessinerJeux);
+el("recherche").addEventListener("input", dessinerChamps);
+dessinerEntete();
+dessinerJeux();
+dessinerSources();
+const depart = location.hash.replace("#", "");
+aller(VUES.some(([id]) => id === depart) ? depart : "jeux");
+</script>

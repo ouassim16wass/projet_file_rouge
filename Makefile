@@ -20,6 +20,7 @@ charger:
 catalogue:
 	$(PYTHON) catalogue/generer_catalogue.py
 	$(PYTHON) catalogue/generer_contrats.py
+	$(PYTHON) catalogue/generer_page_catalogue.py
 
 pipeline: nettoyer transformer charger catalogue
 
