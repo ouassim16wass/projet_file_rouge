@@ -97,7 +97,7 @@ make pipeline
 make tests lint
 ```
 
-Le contrat `contrats/operations.yaml` fait référence. Le nettoyage écarte les lignes invalides vers la quarantaine, signale les anomalies tolérées et pseudonymise les comptes (variable `PSEUDO_SEL` du fichier `.env`). `make pipeline` enchaîne nettoyage, transformation, chargement PostgreSQL et catalogue. Rapports : `docs/rapport_exploration.md`, `docs/rapport_qualite.md`, `docs/rapport_qualite_cartes.md`, `docs/catalogue_donnees.md`. Déploiement, CI/CD et coûts : `docs/deploiement.md`, `docs/gestion_couts.md`, `docs/mesures_couts.md`.
+Les contrats font référence : [`contrats/operations.yaml`](contrats/operations.yaml) (PaySim) et [`contrats/creditcard.yaml`](contrats/creditcard.yaml) (ULB), présentés dans [`docs/contrats_donnees.md`](docs/contrats_donnees.md). Le nettoyage écarte les lignes invalides vers la quarantaine, signale les anomalies tolérées et pseudonymise les comptes (variable `PSEUDO_SEL` du fichier `.env`). `make pipeline` enchaîne nettoyage, transformation, chargement PostgreSQL et catalogue. Rapports : `docs/rapport_exploration.md`, `docs/rapport_qualite.md`, `docs/rapport_qualite_cartes.md`, `docs/catalogue_donnees.md`. Déploiement, CI/CD et coûts : `docs/deploiement.md`, `docs/gestion_couts.md`, `docs/mesures_couts.md`.
 
 ## Structure du dépôt
 
